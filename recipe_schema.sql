@@ -1,3 +1,22 @@
+drop table Customer;
+drop table SavedLists;
+drop table Cuisine;
+drop table Recipe;
+drop table Instruction;
+drop table Ingredient;
+drop table Allergen;
+drop table Nutrition1;
+drop table Nutrition2;
+drop table Fresh;
+drop table Processed;
+drop table RecipeCreator;
+drop table FoodCritic;
+drop table AddRelation;
+drop table Rate;
+drop table Contain;
+drop table ReferencesRelation;
+drop table CanHave;
+
 CREATE TABLE Customer (
   ID INTEGER,
   name CHAR(50),
