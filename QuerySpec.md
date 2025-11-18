@@ -18,6 +18,7 @@ FK: cuisineID
 if title is unique and ID is unique, insert new tuple in Recipe
 
 sql:
+```sql
 INSERT INTO Recipe (ID, title, time_consumed, difficulty, cuisineID)
 SELECT <ID>, '<title>', <time_consumed>, '<difficulty>', <cuisineID>
 WHERE NOT EXISTS (
@@ -30,10 +31,20 @@ AND EXISTS (
     FROM Cuisine
     WHERE ID = <cuisineID>
 );
+```
 
 ## UPDATE
 ## DELETE
 ## SELECTION
+Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
+(RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
+
+sql:
+```sql
+SELECT <ID>, '<name>', '<email_address>',
+    CASE 
+        WHEN <Food>
+```
 ## PROJECTION
 ## JOIN
 ## AGGREGATION with GROUPBY
