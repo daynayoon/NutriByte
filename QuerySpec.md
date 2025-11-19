@@ -56,7 +56,7 @@ query: Find and show the number of recipes in each savedList of the owner, along
 sql:
 ```sql
 SELECT SL.ID, SL.name, COUNT(AR.RecipeID) AS RecipeCount
-FROM Customer C, AddRelation AR, SavedLists SL
+FROM AddRelation AR, SavedLists SL
 LEFT JOIN AddRelation AR ON SL.ownerID = AR.customerID
 GROUP BY SL.ID
 ORDER BY SL.ID
@@ -65,3 +65,14 @@ ORDER BY SL.ID
 ## AGGREGATION with HAVING
 ## NESTED AGGREGATION with GROUPBY
 ## DIVISION
+query: Find the customer ID of the Recipe Creator whose recipe has an average rating of > 4.5
+
+sql:
+```sql
+SELECT C.ID, C.name
+FROM Customer C, AddRelation AR, Rate RT
+JOIN AddRelation AR ON C.ID = AR.customerID
+JOIN Rate RT ON AR.recipeID = R.ID
+GROUP BY C.ID
+HAVING AVG(stars) > 4.5
+```
