@@ -49,7 +49,19 @@ WHERE RC.ID IS NOT NULL OR FC.ID IS NOT NULL;
 ```
 ## PROJECTION
 ## JOIN
+
 ## AGGREGATION with GROUPBY
+query: Find and show the number of recipes in each savedList of the owner, alongside with the savedList ID and name. 
+
+sql:
+```sql
+SELECT SL.ID, SL.name, COUNT(AR.RecipeID) AS RecipeCount
+FROM Customer C, AddRelation AR, SavedLists SL
+LEFT JOIN AddRelation AR ON SL.ownerID = AR.customerID
+GROUP BY SL.ID
+ORDER BY SL.ID
+```
+
 ## AGGREGATION with HAVING
 ## NESTED AGGREGATION with GROUPBY
 ## DIVISION
