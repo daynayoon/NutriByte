@@ -41,9 +41,11 @@ Query: SELECT FoodCritic or RecipeCreator and show all customer information for 
 
 sql:
 ```sql
-SELECT <ID>, '<name>', '<email_address>',
-    CASE 
-        WHEN <Food>
+SELECT C.*, RC.cookingHistory, FC.ratingHistory
+FROM Customer C,
+LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
+LEFT JOIN FoodCritic FC ON C.ID = FC.ID
+WHERE RC.ID IS NOT NULL OR FC.ID IS NOT NULL;
 ```
 ## PROJECTION
 ## JOIN
