@@ -107,11 +107,44 @@ async function initiateDemotable() {
     });
 }
 
-async function insertDemotable(id, name) {
+async function insertRecipe(id, name) {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
-            `INSERT INTO DEMOTABLE (id, name) VALUES (:id, :name)`,
-            [id, name],
+            `INSERT INTO Recipe (ID, title, time_consumed, difficulty, cuisineID)
+                SELECT <ID>, '<title>', <time_consumed>, '<difficulty>', <cuisineID>
+                WHERE NOT EXISTS (
+                    SELECT 1 
+                    FROM RECIPE
+                    WHERE ID = <ID> OR title = <title>
+                )
+                AND EXISTS (
+                    SELECT 1 
+                    FROM Cuisine
+                    WHERE ID = <cuisineID>
+            );`,
+            [id, title, time_consumed, difficulty, cuisineID],
+            { autoCommit: true }
+        );
+
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch(() => {
+        return false;
+    });
+}
+
+// Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
+// (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
+
+async function selectCustomerType(type) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `SELECT C.*, RC.cookingHistory, FC.ratingHistory
+            FROM Customer C,
+            LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
+            LEFT JOIN FoodCritic FC ON C.ID = FC.ID
+            WHERE RC.ID IS NOT NULL OR FC.ID IS NOT NULL
+            ;`,
+            [type],
             { autoCommit: true }
         );
 
@@ -148,7 +181,8 @@ module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
     initiateDemotable, 
-    insertDemotable, 
+    insertRecipe, 
+    selectCustomerType,
     updateNameDemotable, 
     countDemotable
 };
