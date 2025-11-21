@@ -66,6 +66,30 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
+    <h2>Select Customer Type</h2>
+    <button id="btnRecipe">RecipeCreator</button>
+    <button id="btnCritic">FoodCritic</button>
+
+    <table id="customerTable" border="1" style="margin-top: 10px; display:none;">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>name</th>      
+                <th>email_address</th>    
+                <th>History</th>   <!-- cookingHistory or ratingHistory -->
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <form id="selectCustomerType">
+        <button type="RecipeCreator"> update </button> <br>
+        <button type="FoodCritic"> update </button> <br>
+    </form>
+    <!-- A placeholder to display messages related to the select operation. -->
+    <div id="selectionMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
     <h2>Update Name in DemoTable</h2>
     <p>The values are case sensitive and if you enter in the wrong case, the update statement will not do anything.</p>
     <form id="updataNameDemotable">
