@@ -1,21 +1,21 @@
-drop table Customer;
-drop table SavedLists;
-drop table Cuisine;
-drop table Recipe;
-drop table Instruction;
-drop table Ingredient;
-drop table Allergen;
-drop table Nutrition1;
-drop table Nutrition2;
-drop table Fresh;
-drop table Processed;
-drop table RecipeCreator;
-drop table FoodCritic;
-drop table AddRelation;
-drop table Rate;
-drop table Contain;
-drop table ReferencesRelation;
-drop table CanHave;
+DROP TABLE CanHave CASCADE CONSTRAINTS;
+DROP TABLE RecipeReference CASCADE CONSTRAINTS;
+DROP TABLE Contain CASCADE CONSTRAINTS;
+DROP TABLE Rate CASCADE CONSTRAINTS;
+DROP TABLE AddRelation CASCADE CONSTRAINTS;
+DROP TABLE FoodCritic CASCADE CONSTRAINTS;
+DROP TABLE RecipeCreator CASCADE CONSTRAINTS;
+DROP TABLE Processed CASCADE CONSTRAINTS;
+DROP TABLE Fresh CASCADE CONSTRAINTS;
+DROP TABLE Nutrition2 CASCADE CONSTRAINTS;
+DROP TABLE Nutrition1 CASCADE CONSTRAINTS;
+DROP TABLE Allergen CASCADE CONSTRAINTS;
+DROP TABLE Ingredient CASCADE CONSTRAINTS;
+DROP TABLE Instruction CASCADE CONSTRAINTS;
+DROP TABLE Recipe CASCADE CONSTRAINTS;
+DROP TABLE Cuisine CASCADE CONSTRAINTS;
+DROP TABLE SavedLists CASCADE CONSTRAINTS;
+DROP TABLE Customer CASCADE CONSTRAINTS;
 
 CREATE TABLE Customer (
   ID INTEGER,
@@ -153,12 +153,12 @@ CREATE TABLE Contain (
   FOREIGN KEY (IngredientID) REFERENCES Ingredient(ID)
 );
 
-CREATE TABLE ReferencesRelation (
+CREATE TABLE RecipeReference (
   RecipeID INTEGER,
-  ReferencedRecipeID INTEGER,
-  PRIMARY KEY (RecipeID, ReferencedRecipeID),
+  ReferenceID INTEGER,
+  PRIMARY KEY (RecipeID, ReferenceID),
   FOREIGN KEY (RecipeID) REFERENCES Recipe(ID),
-  FOREIGN KEY (ReferencedRecipeID) REFERENCES Recipe(ID)
+  FOREIGN KEY (ReferenceID) REFERENCES Recipe(ID)
 );
 
 CREATE TABLE CanHave (
@@ -271,11 +271,11 @@ INSERT INTO Contain VALUES (1, 4);
 INSERT INTO Contain VALUES (2, 2);
 INSERT INTO Contain VALUES (4, 5);
 
-INSERT INTO ReferencesRelation VALUES (1, 2);
-INSERT INTO ReferencesRelation VALUES (2, 3);
-INSERT INTO ReferencesRelation VALUES (3, 4); 
-INSERT INTO ReferencesRelation VALUES (4, 5);
-INSERT INTO ReferencesRelation VALUES (5, 1);
+INSERT INTO RecipeReference VALUES (1, 2);
+INSERT INTO RecipeReference VALUES (2, 3);
+INSERT INTO RecipeReference VALUES (3, 4); 
+INSERT INTO RecipeReference VALUES (4, 5);
+INSERT INTO RecipeReference VALUES (5, 1);
 
 INSERT INTO CanHave VALUES (1, 1);
 INSERT INTO CanHave VALUES (4, 2);
