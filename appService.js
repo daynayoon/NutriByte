@@ -90,27 +90,38 @@ async function fetchDemotableFromDb() {
 async function initiateRecipe() {
     return await withOracleDB(async (connection) => {
         try {
-            await connection.execute(`DROP TABLE RECIPE`);
-        } catch(err) {
-            console.log('Table might not exist, proceeding to create...');
+            await connection.execute(`DROP TABLE Recipe CASCADE CONSTRAINTS`);
+        } catch (err) {
+            console.log("Recipe table did not exist, continuing...");
         }
 
-        const result = await connection.execute(`
-            CREATE TABLE Recipe (
-                ID INTEGER,
-                title CHAR(100),
-                time_consumed INTEGER,
-                difficulty CHAR(20),
-                cuisineID INTEGER,
-                UNIQUE (title),
-                PRIMARY KEY (ID),
-                FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
-        `);
-        return true;
-    }).catch(() => {
+        try {
+            await connection.execute(`
+                CREATE TABLE Recipe (
+                    ID INTEGER PRIMARY KEY,
+                    title VARCHAR2(100),
+                    time_consumed INTEGER,
+                    difficulty VARCHAR2(20),
+                    cuisineID INTEGER,
+                    UNIQUE (title),
+                    FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
+                )
+            `);
+
+            console.log("Recipe table created successfully");
+            return true;
+
+        } catch (err) {
+            console.error("Error creating Recipe table:", err);
+            return false;
+        }
+
+    }).catch((err) => {
+        console.error("Oracle failure:", err);
         return false;
     });
 }
+
 
 async function insertRecipe(id, title, time_consumed, difficulty, cuisineID) {
     return await withOracleDB(async (connection) => {
