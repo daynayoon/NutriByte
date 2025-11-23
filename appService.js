@@ -80,26 +80,31 @@ async function testOracleConnection() {
 
 async function fetchDemotableFromDb() {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT * FROM DEMOTABLE');
+        const result = await connection.execute('SELECT * FROM RECIPE');
         return result.rows;
     }).catch(() => {
         return [];
     });
 }
 
-async function initiateDemotable() {
+async function initiateRecipe() {
     return await withOracleDB(async (connection) => {
         try {
-            await connection.execute(`DROP TABLE DEMOTABLE`);
+            await connection.execute(`DROP TABLE RECIPE`);
         } catch(err) {
             console.log('Table might not exist, proceeding to create...');
         }
 
         const result = await connection.execute(`
-            CREATE TABLE DEMOTABLE (
-                id NUMBER PRIMARY KEY,
-                name VARCHAR2(20)
-            )
+            CREATE TABLE Recipe (
+                ID INTEGER,
+                title CHAR(100),
+                time_consumed INTEGER,
+                difficulty CHAR(20),
+                cuisineID INTEGER,
+                UNIQUE (title),
+                PRIMARY KEY (ID),
+                FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
         `);
         return true;
     }).catch(() => {
@@ -107,20 +112,20 @@ async function initiateDemotable() {
     });
 }
 
-async function insertRecipe(id, name) {
+async function insertRecipe(id, title, time_consumed, difficulty, cuisineID) {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
             `INSERT INTO Recipe (ID, title, time_consumed, difficulty, cuisineID)
-                SELECT <ID>, '<title>', <time_consumed>, '<difficulty>', <cuisineID>
+                SELECT ID, title, time_consumed, difficulty, cuisineID
                 WHERE NOT EXISTS (
-                    SELECT 1 
-                    FROM RECIPE
-                    WHERE ID = <ID> OR title = <title>
+                    SELECT * 
+                    FROM RECIPE R1
+                    WHERE R.ID = <ID> OR R.title = <title>
                 )
                 AND EXISTS (
-                    SELECT 1 
-                    FROM Cuisine
-                    WHERE ID = <cuisineID>
+                    SELECT * 
+                    FROM Cuisine C
+                    WHERE ID = cuisineID
             );`,
             [id, title, time_consumed, difficulty, cuisineID],
             { autoCommit: true }
@@ -138,14 +143,14 @@ async function insertRecipe(id, name) {
 async function selectCustomerType(type) {
     return await withOracleDB(async (connection) => {
         let sql;
-        if (type === 'recipe') {
+        if (type === 'recipe_creator') {
             sql = `
                 SELECT C.ID, C.name, C.email_address, RC.cookingHistory AS history
                 FROM Customer C
                 JOIN RecipeCreator RC ON C.ID = RC.ID
                 ORDER BY C.ID
             `;
-        } else if (type === 'critic') {
+        } else if (type === 'food_critic') {
             sql = `
                 SELECT C.ID, C.name, C.email_address, FC.ratingHistory AS history
                 FROM Customer C
@@ -166,7 +171,7 @@ async function selectCustomerType(type) {
 async function updateNameDemotable(oldName, newName) {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
-            `UPDATE DEMOTABLE SET name=:newName where name=:oldName`,
+            `UPDATE RECIPE SET name=:newName where name=:oldName`,
             [newName, oldName],
             { autoCommit: true }
         );
@@ -179,7 +184,7 @@ async function updateNameDemotable(oldName, newName) {
 
 async function countDemotable() {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT Count(*) FROM DEMOTABLE');
+        const result = await connection.execute('SELECT Count(*) FROM RECIPE');
         return result.rows[0][0];
     }).catch(() => {
         return -1;
@@ -189,7 +194,7 @@ async function countDemotable() {
 module.exports = {
     testOracleConnection,
     fetchDemotableFromDb,
-    initiateDemotable, 
+    initiateRecipe, 
     insertRecipe, 
     selectCustomerType,
     updateNameDemotable, 
