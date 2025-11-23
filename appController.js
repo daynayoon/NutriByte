@@ -15,13 +15,13 @@ router.get('/check-db-connection', async (req, res) => {
     }
 });
 
-router.get('/demotable', async (req, res) => {
+router.get('/recipe', async (req, res) => {
     const tableContent = await appService.fetchDemotableFromDb();
     res.json({data: tableContent});
 });
 
-router.post("/initiate-demotable", async (req, res) => {
-    const initiateResult = await appService.initiateDemotable();
+router.post("/initiate-recipe", async (req, res) => {
+    const initiateResult = await appService.initiateRecipe();
     if (initiateResult) {
         res.json({ success: true });
     } else {
@@ -29,9 +29,9 @@ router.post("/initiate-demotable", async (req, res) => {
     }
 });
 
-router.post("/insert-demotable", async (req, res) => {
-    const { id, name } = req.body;
-    const insertResult = await appService.insertDemotable(id, name);
+router.post("/insert-recipe", async (req, res) => {
+    const { id, title, time_consumed, difficulty, cuisineID} = req.body;
+    const insertResult = await appService.insertRecipe(id, title, time_consumed, difficulty, cuisineID);
     if (insertResult) {
         res.json({ success: true });
     } else {
