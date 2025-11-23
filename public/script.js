@@ -38,10 +38,10 @@ async function checkDbConnection() {
 
 // Fetches data from the demotable and displays it.
 async function fetchAndDisplayUsers() {
-    const tableElement = document.getElementById('demotable');
+    const tableElement = document.getElementById('recipe');
     const tableBody = tableElement.querySelector('tbody');
 
-    const response = await fetch('/demotable', {
+    const response = await fetch('/recipe', {
         method: 'GET'
     });
 
@@ -78,7 +78,7 @@ async function resetRecipe() {
     }
 }
 
-// Inserts new records into the demotable.
+// Inserts new records into the Recipe.
 async function insertRecipe(event) {
     event.preventDefault();
 
@@ -95,7 +95,7 @@ async function insertRecipe(event) {
         },
         body: JSON.stringify({
             id: idValue,
-            Title: titleValue,
+            title: titleValue,
             time_consumed: time_consumedValue,
             difficulty: difficultyValue,
             CusineID: cuisineIDValue
@@ -168,7 +168,7 @@ window.onload = function() {
     checkDbConnection();
     fetchTableData();
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
-    document.getElementById("insertDemotable").addEventListener("submit", insertRecipe);
+    document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("updataNameDemotable").addEventListener("submit", updateNameDemotable);
     document.getElementById("countDemotable").addEventListener("click", countDemotable);
 };
