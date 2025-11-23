@@ -41,11 +41,15 @@ Query: SELECT FoodCritic or RecipeCreator and show all customer information for 
 
 sql:
 ```sql
-SELECT C.*, RC.cookingHistory, FC.ratingHistory
-FROM Customer C,
-LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
-LEFT JOIN FoodCritic FC ON C.ID = FC.ID
-WHERE RC.ID IS NOT NULL OR FC.ID IS NOT NULL;
+SELECT C.ID, C.name, C.email_address, RC.cookingHistory AS history
+FROM Customer C
+JOIN RecipeCreator RC ON C.ID = RC.ID
+ORDER BY C.ID
+
+SELECT C.ID, C.name, C.email_address, FC.ratingHistory AS history
+FROM Customer C
+JOIN FoodCritic FC ON C.ID = FC.ID
+ORDER BY C.ID
 ```
 ## PROJECTION
 ## JOIN

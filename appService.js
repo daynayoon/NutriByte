@@ -137,18 +137,27 @@ async function insertRecipe(id, name) {
 
 async function selectCustomerType(type) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `SELECT C.*, RC.cookingHistory, FC.ratingHistory
-            FROM Customer C,
-            LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
-            LEFT JOIN FoodCritic FC ON C.ID = FC.ID
-            WHERE RC.ID IS NOT NULL OR FC.ID IS NOT NULL
-            ;`,
-            [type],
-            { autoCommit: true }
-        );
+        let sql;
+        if (type === 'recipe') {
+            sql = `
+                SELECT C.ID, C.name, C.email_address, RC.cookingHistory AS history
+                FROM Customer C
+                JOIN RecipeCreator RC ON C.ID = RC.ID
+                ORDER BY C.ID
+            `;
+        } else if (type === 'critic') {
+            sql = `
+                SELECT C.ID, C.name, C.email_address, FC.ratingHistory AS history
+                FROM Customer C
+                JOIN FoodCritic FC ON C.ID = FC.ID
+                ORDER BY C.ID
+            `;
+        } else {
+            return []; // invalid type
+        }
 
-        return result.rowsAffected && result.rowsAffected > 0;
+        const result = await connection.execute(sql, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+        return result.rows; // return the actual rows
     }).catch(() => {
         return false;
     });
