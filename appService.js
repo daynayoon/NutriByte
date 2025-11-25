@@ -78,9 +78,9 @@ async function testOracleConnection() {
     });
 }
 
-async function fetchDemotableFromDb() {
+async function fetchRecipeFromDb() {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT * FROM RECIPE');
+        const result = await connection.execute('SELECT * FROM Recipe');
         return result.rows;
     }).catch(() => {
         return [];
@@ -190,44 +190,10 @@ async function selectCustomerType(type) {
     });
 }
 
-async function updateNameDemotable(oldName, newName) {
-    return await withOracleDB(async (connection) => {
-        const sql = `
-            UPDATE Recipe
-            SET title = :newTitle
-            WHERE title = :oldTitle
-        `;
-        const result = await connection.execute(
-            sql,
-            {
-                newTitle: newName,
-                oldTitle: oldName
-            },
-            { autoCommit: true }
-        );
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch((err) => {
-        console.error("Update error:", err);
-        return false;
-    });
-}
-
-
-async function countDemotable() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT Count(*) FROM RECIPE');
-        return result.rows[0][0];
-    }).catch(() => {
-        return -1;
-    });
-}
-
 module.exports = {
     testOracleConnection,
-    fetchDemotableFromDb,
+    fetchRecipeFromDb,
     initiateRecipe, 
     insertRecipe, 
     selectCustomerType,
-    updateNameDemotable, 
-    countDemotable
 };
