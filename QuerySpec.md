@@ -36,6 +36,7 @@ AND EXISTS (
 ## UPDATE
 ## DELETE
 Query: Delete an ingredient by ID. Deleting the ingredient also removes related tuples in Fresh, Processed, Contain, and CanHave via ON DELETE CASCADE.
+
 sql:
 ```sql
 DELETE FROM Ingredient
@@ -60,6 +61,18 @@ ORDER BY C.ID
 ```
 ## PROJECTION
 ## JOIN
+query: For a given recipe title and minimum rating, find all customers who rated that recipe with at least that many stars, showing customer info and their rating.
+
+sql:
+```sql
+SELECT C.ID, C.name, C.email_address, R.stars
+FROM Customer C
+JOIN Rate R ON C.ID = R.CustomerID
+JOIN Recipe Re ON Re.ID = R.RecipeID
+WHERE Re.title = '<recipeTitle>'
+  AND R.stars >= <minStars>
+ORDER BY C.ID;
+```
 
 ## AGGREGATION with GROUPBY
 query: Find and show the number of recipes in each savedList of the owner, alongside with the savedList ID and name. 
@@ -75,6 +88,24 @@ ORDER BY SL.ID
 
 ## AGGREGATION with HAVING
 ## NESTED AGGREGATION with GROUPBY
+query: Find the cuisine style(s) with the highest average recipe rating.
+
+sql:
+```sql
+SELECT Cu.style, AVG(R.stars) AS avgCuisineRating
+FROM Cuisine Cu
+JOIN Recipe Re ON Cu.ID = Re.cuisineID
+JOIN Rate R ON R.RecipeID = Re.ID
+GROUP BY Cu.style
+HAVING AVG(R.stars) >= ALL (
+    SELECT AVG(R2.stars)
+    FROM Cuisine Cu2
+    JOIN Recipe Re2 ON Cu2.ID = Re2.cuisineID
+    JOIN Rate R2 ON R2.RecipeID = Re2.ID
+    GROUP BY Cu2.style
+);
+```
+
 ## DIVISION
 query: Find the customer ID of the Recipe Creator whose recipe has an average rating of > 4.5
 
