@@ -35,6 +35,13 @@ AND EXISTS (
 
 ## UPDATE
 ## DELETE
+Query: Delete an ingredient by ID. Deleting the ingredient also removes related tuples in Fresh, Processed, Contain, and CanHave via ON DELETE CASCADE.
+sql:
+```sql
+DELETE FROM Ingredient
+WHERE ID = <ID>;
+```
+
 ## SELECTION
 Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
 (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
