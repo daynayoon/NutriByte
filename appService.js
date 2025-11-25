@@ -192,17 +192,26 @@ async function selectCustomerType(type) {
 
 async function updateNameDemotable(oldName, newName) {
     return await withOracleDB(async (connection) => {
+        const sql = `
+            UPDATE Recipe
+            SET title = :newTitle
+            WHERE title = :oldTitle
+        `;
         const result = await connection.execute(
-            `UPDATE RECIPE SET name=:newName where name=:oldName`,
-            [newName, oldName],
+            sql,
+            {
+                newTitle: newName,
+                oldTitle: oldName
+            },
             { autoCommit: true }
         );
-
         return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
+    }).catch((err) => {
+        console.error("Update error:", err);
         return false;
     });
 }
+
 
 async function countDemotable() {
     return await withOracleDB(async (connection) => {
