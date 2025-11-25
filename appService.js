@@ -125,28 +125,39 @@ async function initiateRecipe() {
 
 async function insertRecipe(id, title, time_consumed, difficulty, cuisineID) {
     return await withOracleDB(async (connection) => {
+        const sql = `
+            INSERT INTO Recipe (ID, title, time_consumed, difficulty, cuisineID)
+            SELECT :id, :title, :time_consumed, :difficulty, :cuisineID
+            FROM dual
+            WHERE NOT EXISTS (
+                SELECT 1 
+                FROM Recipe R
+                WHERE R.ID = :id OR R.title = :title
+            )
+            AND EXISTS (
+                SELECT 1
+                FROM Cuisine C
+                WHERE C.ID = :cuisineID
+            )
+        `;
         const result = await connection.execute(
-            `INSERT INTO Recipe (ID, title, time_consumed, difficulty, cuisineID)
-                SELECT ID, title, time_consumed, difficulty, cuisineID
-                WHERE NOT EXISTS (
-                    SELECT * 
-                    FROM RECIPE R1
-                    WHERE R.ID = <ID> OR R.title = <title>
-                )
-                AND EXISTS (
-                    SELECT * 
-                    FROM Cuisine C
-                    WHERE ID = cuisineID
-            );`,
-            [id, title, time_consumed, difficulty, cuisineID],
+            sql,
+            {
+                id,
+                title,
+                time_consumed,
+                difficulty,
+                cuisineID
+            },
             { autoCommit: true }
         );
-
         return result.rowsAffected && result.rowsAffected > 0;
-    }).catch(() => {
+    }).catch((err) => {
+        console.error("Insert error:", err);
         return false;
     });
 }
+
 
 // Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
 // (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
