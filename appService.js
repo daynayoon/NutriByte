@@ -98,15 +98,15 @@ async function initiateRecipe() {
         try {
             await connection.execute(`
                 CREATE TABLE Recipe (
-                    ID INTEGER PRIMARY KEY,
-                    title VARCHAR2(100),
-                    time_consumed INTEGER,
-                    difficulty VARCHAR2(20),
-                    cuisineID INTEGER,
-                    UNIQUE (title),
-                    FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
-                )
-            `);
+                ID INTEGER,
+                title CHAR(100),
+                time_consumed INTEGER,
+                difficulty CHAR(20),
+                cuisineID INTEGER,
+                UNIQUE (title),
+                PRIMARY KEY (ID),
+                FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
+            )`, [], {autoCommit: true});
 
             console.log("Recipe table created successfully");
             return true;
@@ -122,38 +122,18 @@ async function initiateRecipe() {
     });
 }
 
-
 async function insertRecipe(id, title, time_consumed, difficulty, cuisineID) {
     return await withOracleDB(async (connection) => {
-        const sql = `
-            INSERT INTO Recipe (ID, title, time_consumed, difficulty, cuisineID)
-            SELECT :id, :title, :time_consumed, :difficulty, :cuisineID
-            FROM dual
-            WHERE NOT EXISTS (
-                SELECT 1 
-                FROM Recipe R
-                WHERE R.ID = :id OR R.title = :title
-            )
-            AND EXISTS (
-                SELECT 1
-                FROM Cuisine C
-                WHERE C.ID = :cuisineID
-            )
-        `;
         const result = await connection.execute(
-            sql,
-            {
-                id,
-                title,
-                time_consumed,
-                difficulty,
-                cuisineID
-            },
+            `INSERT INTO Recipe (id, title, time_consumed, difficulty, cuisineID) 
+            VALUES (:id, :title, :time_consumed, :difficulty, :cuisineID)`,
+            [id, title, time_consumed, difficulty, cuisineID],
             { autoCommit: true }
         );
+
         return result.rowsAffected && result.rowsAffected > 0;
     }).catch((err) => {
-        console.error("Insert error:", err);
+        console.error("Error inserting into Recipe table:", err);
         return false;
     });
 }
