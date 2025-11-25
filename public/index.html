@@ -67,8 +67,11 @@
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Query 4: Select Customer Type</h2>
-    <button id="btnRecipe">RecipeCreator</button>
-    <button id="btnCritic">FoodCritic</button>
+    Customer Type:
+    <select id="customerType">
+        <option value="recipeCreator">Recipe Creator</option>
+        <option value="foodCritic">Food Critic</option>
+    </select> <br><br>
 
     <table id="customerTable" border="1" style="margin-top: 10px; display:none;">
         <thead>
@@ -82,7 +85,7 @@
         <tbody></tbody>
     </table>
     <form id="selectCustomerType">
-        <button type="Type"> update </button> <br>
+        <button type="submit"> update </button> <br>
     </form>
     <!-- A placeholder to display messages related to the select operation. -->
     <div id="selectionMsg"></div>
