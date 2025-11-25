@@ -98,7 +98,7 @@ async function insertRecipe(event) {
             title: titleValue,
             time_consumed: time_consumedValue,
             difficulty: difficultyValue,
-            CusineID: cuisineIDValue
+            cuisineID: cuisineIDValue
         })
     });
 
