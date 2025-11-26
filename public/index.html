@@ -67,6 +67,27 @@
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Query 4: Select Customer Type</h2>
+
+    <!-- Show 'Customer'. 
+        Data will be fetched and inserted here dynamically using JavaScript. -->
+    Show Customer based on Type:
+        <table id="customer" border="1">
+            <thead>
+                <tr>
+                    <!--Table head, need to be adjusted accordingly to align with your own.-->
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>email_address</th>
+                    <th>cookingHistory</th>
+                    <th>ratingHistory</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
     Customer Type:
     <select id="customerType">
         <option value="recipeCreator">Recipe Creator</option>
@@ -88,7 +109,7 @@
         <button type="submit"> update </button> <br>
     </form>
     <!-- A placeholder to display messages related to the select operation. -->
-    <div id="selectionMsg"></div>
+    <div id="customerSelectionResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
 

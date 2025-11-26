@@ -138,6 +138,21 @@ async function insertRecipe(id, title, time_consumed, difficulty, cuisineID) {
     });
 }
 
+async function fetchCustomerFromDb() {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `
+                SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
+                FROM Customer C
+                JOIN RecipeCreator RC ON C.ID = RC.ID
+                JOIN FoodCritic FC ON C.ID = FC.ID
+                ORDER BY C.ID
+            `);
+        return result.rows;
+    }).catch(() => {
+        return [];
+    });
+}
 
 // Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
 // (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
@@ -170,10 +185,13 @@ async function selectCustomerType(type) {
     });
 }
 
+
+
 module.exports = {
     testOracleConnection,
     fetchRecipeFromDb,
     initiateRecipe, 
     insertRecipe, 
+    fetchCustomerFromDb,
     selectCustomerType,
 };
