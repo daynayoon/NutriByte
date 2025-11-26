@@ -237,6 +237,34 @@ async function getCustomersByRecipeAndRating(recipeTitle, minStars) {
     });
 }
 
+async function getTopCuisinesByAvgRating() {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `
+            SELECT Cu.style,
+                   AVG(R.stars) AS avgCuisineRating
+            FROM Cuisine Cu
+            JOIN Recipe Re ON Cu.ID = Re.cuisineID
+            JOIN Rate R   ON R.RecipeID = Re.ID
+            GROUP BY Cu.style
+            HAVING AVG(R.stars) >= ALL (
+                SELECT AVG(R2.stars)
+                FROM Cuisine Cu2
+                JOIN Recipe Re2 ON Cu2.ID = Re2.cuisineID
+                JOIN Rate R2   ON R2.RecipeID = Re2.ID
+                GROUP BY Cu2.style
+            )
+            `,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows;
+    }).catch((err) => {
+        console.error("Error in getTopCuisinesByAvgRating:", err);
+        return [];
+    });
+}
+
 module.exports = {
     testOracleConnection,
     fetchRecipeFromDb,
@@ -247,4 +275,5 @@ module.exports = {
     fetchIngredients,
     deleteIngredient,
     getCustomersByRecipeAndRating,
+    getTopCuisinesByAvgRating,
 };
