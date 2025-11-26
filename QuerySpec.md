@@ -34,7 +34,30 @@ AND EXISTS (
 ```
 
 ## UPDATE
+Query: UPDATE a Customer's name and/or email_address by selecting an existing Customer.
+relation: `Customer`
+updated attributes:
+    name (non-PK), email_address (non-PK, UNIQUE)
+PK: ID
+CK: email_address
+
+sql: 
+```sql
+UPDATE Customer
+SET name = :newName,
+    email_address = :newEmail
+WHERE ID = :customerID;
+```
+
 ## DELETE
+Query: Delete an ingredient by ID. Deleting the ingredient also removes related tuples in Fresh, Processed, Contain, and CanHave via ON DELETE CASCADE.
+
+sql:
+```sql
+DELETE FROM Ingredient
+WHERE ID = <ID>;
+```
+
 ## SELECTION
 Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
 (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
@@ -52,7 +75,44 @@ JOIN FoodCritic FC ON C.ID = FC.ID
 ORDER BY C.ID
 ```
 ## PROJECTION
+Query: Show only the selected attributes of the Ingredient relatino based on user selection.
+relation: Ingredient
+attributes:
+    ID: INTEGER
+    name: CHAR(100)
+User input: User selects which attributes to display (ID, name, or both)
+
+sql:
+- If user selects both:
+```sql
+SELECT ID, name
+FROM Ingredient;
+```
+- If user select only name:
+```sql
+SELECT name
+FROM Ingredient;
+```
+- If user select only ID:
+```sql
+SELECT ID
+FROM Ingredient;
+```
+
+
 ## JOIN
+query: For a given recipe title and minimum rating, find all customers who rated that recipe with at least that many stars, showing customer info and their rating.
+
+sql:
+```sql
+SELECT C.ID, C.name, C.email_address, R.stars
+FROM Customer C
+JOIN Rate R ON C.ID = R.CustomerID
+JOIN Recipe Re ON Re.ID = R.RecipeID
+WHERE Re.title = '<recipeTitle>'
+  AND R.stars >= <minStars>
+ORDER BY C.ID;
+```
 
 ## AGGREGATION with GROUPBY
 query: Find and show the number of recipes in each savedList of the owner, alongside with the savedList ID and name. 
@@ -67,7 +127,39 @@ ORDER BY SL.ID
 ```
 
 ## AGGREGATION with HAVING
+Query: Find recipe titles whose average rating is greater than or equal to a user-selected threshold.
+relations: Recipe, Rate
+User input: threshold (e.g., 4.0, 4.5)
+
+sql
+```sql
+SELECT R.title, AVG(RT.stars) AS avg_rating
+FROM Recipe R
+JOIN Rate RT ON R.ID = RT.RecipeID
+GROUP BY R.ID, R.title
+HAVING AVG(RT.stars) >= :threshold
+ORDER BY avg_rating DESC;
+```
+
 ## NESTED AGGREGATION with GROUPBY
+query: Find the cuisine style(s) with the highest average recipe rating.
+
+sql:
+```sql
+SELECT Cu.style, AVG(R.stars) AS avgCuisineRating
+FROM Cuisine Cu
+JOIN Recipe Re ON Cu.ID = Re.cuisineID
+JOIN Rate R ON R.RecipeID = Re.ID
+GROUP BY Cu.style
+HAVING AVG(R.stars) >= ALL (
+    SELECT AVG(R2.stars)
+    FROM Cuisine Cu2
+    JOIN Recipe Re2 ON Cu2.ID = Re2.cuisineID
+    JOIN Rate R2 ON R2.RecipeID = Re2.ID
+    GROUP BY Cu2.style
+);
+```
+
 ## DIVISION
 query: Find the customer ID of the Recipe Creator whose recipe has an average rating of > 4.5
 
