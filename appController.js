@@ -45,15 +45,14 @@ router.get('/customer', async (req, res) => {
 });
 
 router.post("/select-customer", async (req, res) => {
-    const { id, name, email_address, history} = req.body;
-    const selectCustomerResult = await appService.selectCustomerType(id, name, email_address, history);
+    const {type} = req.body;
+    const selectCustomerResult = await appService.selectCustomerType(type);
     if (selectCustomerResult) {
         res.json({ success: true });
     } else {
         res.status(500).json({ success: false });
     }
 });
-
 
 router.get('/ingredients', async (req, res) => {
     const ingredients = await appService.fetchIngredients();
