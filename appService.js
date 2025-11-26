@@ -214,6 +214,28 @@ async function deleteIngredient(id) {
     });
 }
 
+async function getCustomersByRecipeAndRating(recipeTitle, minStars) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `
+            SELECT C.ID, C.name, C.email_address, R.stars
+            FROM Customer C
+            JOIN Rate R ON C.ID = R.CustomerID
+            JOIN Recipe Re ON R.RecipeID = Re.ID
+            WHERE Re.title = :recipeTitle
+              AND R.stars >= :minStars
+            ORDER BY C.ID
+            `,
+            { recipeTitle, minStars },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows;
+    }).catch((err) => {
+        console.error("Error in getCustomersByRecipeAndRating:", err);
+        return [];
+    });
+}
+
 module.exports = {
     testOracleConnection,
     fetchRecipeFromDb,
@@ -223,4 +245,5 @@ module.exports = {
     selectCustomerType,
     fetchIngredients,
     deleteIngredient,
+    getCustomersByRecipeAndRating,
 };
