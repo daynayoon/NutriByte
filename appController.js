@@ -81,4 +81,9 @@ router.post('/customers-by-recipe', async (req, res) => {
     res.json({ data: rows });
 });
 
+router.get('/top-cuisines', async (req, res) => {
+    const rows = await appService.getTopCuisinesByAvgRating();
+    res.json({ data: rows });
+});
+
 module.exports = router;
