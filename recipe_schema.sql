@@ -177,19 +177,21 @@ INSERT INTO Customer VALUES (4, 'cpsc304', 'cpsc304@example.com');
 INSERT INTO Customer VALUES (5, 'ubc cs', 'ubccs@example.com');
 INSERT INTO Customer VALUES (100, 'food critic', 'food_critic@example.com');
 INSERT INTO Customer VALUES (200, 'recipe creator', 'recipe_creator@example.com');
+INSERT INTO Customer VALUES (300, 'just customer', 'just_customer@example.com');
 
 INSERT INTO RecipeCreator VALUES (1, 'Created 10 recipes this month');
 INSERT INTO RecipeCreator VALUES (2, 'Specializes in Korean dishes');
 INSERT INTO RecipeCreator VALUES (3, 'Focuses on Italian fusion');
 INSERT INTO RecipeCreator VALUES (4, 'Tests community recipes');
 INSERT INTO RecipeCreator VALUES (5, 'New creator, learning sushi');
+INSERT INTO RecipeCreator VALUES (200, 'recipe professional');
 
 INSERT INTO FoodCritic VALUES (1, 'Rated 50 recipes in total');
 INSERT INTO FoodCritic VALUES (2, 'Prefers spicy foods');
 INSERT INTO FoodCritic VALUES (3, 'Writes detailed reviews');
 INSERT INTO FoodCritic VALUES (4, 'Cares about presentation');
 INSERT INTO FoodCritic VALUES (5, 'Values ingredient quality');
-INSERT INTO FoodCritic VALUES (100, 'Values ingredient quality');
+INSERT INTO FoodCritic VALUES (100, 'food criticizing professional');
 
 INSERT INTO SavedLists VALUES (1, 'Favorites', 1);
 INSERT INTO SavedLists VALUES (2, 'To Try', 2);
