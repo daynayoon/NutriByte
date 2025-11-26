@@ -116,17 +116,32 @@ async function insertRecipe(event) {
 async function selectCustomerType(event) {
     const typeValue = document.getElementById('customerType');
 
+    const tableElement = document.getElementById('customer');
+    const tableBody = tableElement.querySelector('tbody');
+
     const response = await fetch('/select-customer', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
         body: JSON.stringify({
-            type: typeValue
+            type : typeValue
         })
-    })
+    });
 
     const responseData = await response.json();
+    const demotableContent = responseData.data;
+
+    // Always clear old, already fetched data before new fetching process.
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    demotableContent.forEach(user => {
+        const row = tableBody.insertRow();
+        user.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+    });
+    
     const messageElement = document.getElementById('customerSelectionResultMsg');
 
     if (responseData.success) {

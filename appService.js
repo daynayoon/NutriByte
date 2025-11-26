@@ -160,29 +160,30 @@ async function fetchCustomerFromDb() {
 async function selectCustomerType(type) {
     return await withOracleDB(async (connection) => {
         if (type === 'recipe_creator') {
-            sql = `
+            const result = await connection.execute(
+            `
                 SELECT C.ID, C.name, C.email_address, RC.cookingHistory
                 FROM Customer C
                 JOIN RecipeCreator RC ON C.ID = RC.ID
                 ORDER BY C.ID
-            `, [id, name, email_address, history],
-            { autoCommit: true }
-            ;
+            `
+            );
+            return result.rows;
         } else if (type === 'food_critic') {
-            sql = `
+            const result = await connection.execute(
+                `
                 SELECT C.ID, C.name, C.email_address, FC.ratingHistory
                 FROM Customer C
                 JOIN FoodCritic FC ON C.ID = FC.ID
                 ORDER BY C.ID
-            `, [id, name, email_address, history],
-            { autoCommit: true }
-            ;
+                `
+            );
+            return result.rows;
         } else {
             return []; // invalid type
         }
-        return result.rowsAffected && result.rowsAffected > 0;
     }).catch(() => {
-        return false;
+        return [];
     });
 }
 
