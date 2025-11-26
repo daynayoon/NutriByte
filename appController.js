@@ -70,4 +70,15 @@ router.delete('/ingredient/:id', async (req, res) => {
     }
 });
 
+router.post('/customers-by-recipe', async (req, res) => {
+    const { recipeTitle, minStars } = req.body;
+
+    if (!recipeTitle || !minStars) {
+        return res.status(400).json({ success: false, message: 'recipeTitle and minStars are required.' });
+    }
+
+    const rows = await appService.getCustomersByRecipeAndRating(recipeTitle, minStars);
+    res.json({ data: rows });
+});
+
 module.exports = router;
