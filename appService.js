@@ -144,8 +144,8 @@ async function fetchCustomerFromDb() {
             `
                 SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
                 FROM Customer C
-                JOIN RecipeCreator RC ON C.ID = RC.ID
-                JOIN FoodCritic FC ON C.ID = FC.ID
+                LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
+                LEFT JOIN FoodCritic FC ON C.ID = FC.ID
                 ORDER BY C.ID
             `);
         return result.rows;
@@ -159,31 +159,33 @@ async function fetchCustomerFromDb() {
 
 async function selectCustomerType(type) {
     return await withOracleDB(async (connection) => {
-        let sql;
         if (type === 'recipe_creator') {
             sql = `
-                SELECT C.ID, C.name, C.email_address, RC.cookingHistory AS history
+                SELECT C.ID, C.name, C.email_address, RC.cookingHistory
                 FROM Customer C
                 JOIN RecipeCreator RC ON C.ID = RC.ID
                 ORDER BY C.ID
-            `;
+            `, [id, name, email_address, history],
+            { autoCommit: true }
+            ;
         } else if (type === 'food_critic') {
             sql = `
-                SELECT C.ID, C.name, C.email_address, FC.ratingHistory AS history
+                SELECT C.ID, C.name, C.email_address, FC.ratingHistory
                 FROM Customer C
                 JOIN FoodCritic FC ON C.ID = FC.ID
                 ORDER BY C.ID
-            `;
+            `, [id, name, email_address, history],
+            { autoCommit: true }
+            ;
         } else {
             return []; // invalid type
         }
-
-        const result = await connection.execute(sql, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
-        return result.rows; // return the actual rows
+        return result.rowsAffected && result.rowsAffected > 0;
     }).catch(() => {
         return false;
     });
 }
+
 async function fetchIngredients() {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
