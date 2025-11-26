@@ -39,4 +39,19 @@ router.post("/insert-recipe", async (req, res) => {
     }
 });
 
+router.get('/customer', async (req, res) => {
+    const tableContent = await appService.fetchCustomerFromDb();
+    res.json({data: tableContent});
+});
+
+router.post("/select-customer", async (req, res) => {
+    const { id, name, email_address, history} = req.body;
+    const selectCustomerResult = await appService.selectCustomerType(id, name, email_address, history);
+    if (selectCustomerResult) {
+        res.json({ success: true });
+    } else {
+        res.status(500).json({ success: false });
+    }
+});
+
 module.exports = router;
