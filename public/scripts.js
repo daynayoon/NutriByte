@@ -114,13 +114,15 @@ async function insertRecipe(event) {
 }
 
 async function selectCustomerType(event) {
-    const typeValue = document.getElementById('customerType');
-
+    const typeValue = document.getElementById('customerType').value;
     const tableElement = document.getElementById('customer');
     const tableBody = tableElement.querySelector('tbody');
 
     const response = await fetch('/select-customer', {
         method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
             type : typeValue
         })
@@ -187,7 +189,7 @@ window.onload = function() {
     fetchTableData();
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
-    document.getElementById("selectCustomerType").addEventListener("submit", selectCustomerType);
+    document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
 };
 
 // General function to refresh the displayed table data. 

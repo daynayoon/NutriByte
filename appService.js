@@ -159,7 +159,7 @@ async function fetchCustomerFromDb() {
 
 async function selectCustomerType(type) {
     return await withOracleDB(async (connection) => {
-        if (type === 'recipe_creator') {
+        if (type === "recipeCreator") {
             const result = await connection.execute(
             `
                 SELECT C.ID, C.name, C.email_address, RC.cookingHistory
@@ -169,7 +169,7 @@ async function selectCustomerType(type) {
             `
             );
             return result.rows;
-        } else if (type === 'food_critic') {
+        } else if (type === "foodCritic") {
             const result = await connection.execute(
                 `
                 SELECT C.ID, C.name, C.email_address, FC.ratingHistory
