@@ -127,6 +127,19 @@ ORDER BY SL.ID
 ```
 
 ## AGGREGATION with HAVING
+Query: Find recipe titles whose average rating is greater than or equal to a user-selected threshold.
+relations: Recipe, Rate
+User input: threshold (e.g., 4.0, 4.5)
+
+sql
+```sql
+SELECT R.title, AVG(RT.stars) AS avg_rating
+FROM Recipe R
+JOIN Rate RT ON R.ID = RT.RecipeID
+GROUP BY R.ID, R.title
+HAVING AVG(RT.stars) >= :threshold
+ORDER BY avg_rating DESC;
+```
 
 ## NESTED AGGREGATION with GROUPBY
 query: Find the cuisine style(s) with the highest average recipe rating.
