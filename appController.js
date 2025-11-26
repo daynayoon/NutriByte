@@ -39,4 +39,19 @@ router.post("/insert-recipe", async (req, res) => {
     }
 });
 
+router.get('/ingredients', async (req, res) => {
+    const ingredients = await appService.fetchIngredients();
+    res.json({ data: ingredients });
+});
+
+router.delete('/ingredient/:id', async (req, res) => {
+    const id = req.params.id;
+    const success = await appService.deleteIngredient(id);
+    if (success) {
+        res.json({ success: true, message: 'Ingredient deleted successfully.' });
+    } else {
+        res.status(400).json({ success: false, message: 'Failed to delete ingredient.' });
+    }
+});
+
 module.exports = router;

@@ -170,10 +170,40 @@ async function selectCustomerType(type) {
     });
 }
 
+async function fetchIngredients() {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `SELECT ID, name FROM Ingredient ORDER BY ID`,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows;
+    }).catch((err) => {
+        console.error("Error fetching ingredients:", err);
+        return [];
+    });
+}
+
+async function deleteIngredient(id) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `DELETE FROM Ingredient WHERE ID = :id`,
+            [id],
+            { autoCommit: true }
+        );
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch((err) => {
+        console.error("Error deleting ingredient:", err);
+        return false;
+    });
+}
+
 module.exports = {
     testOracleConnection,
     fetchRecipeFromDb,
     initiateRecipe, 
     insertRecipe, 
     selectCustomerType,
+    fetchIngredients,
+    deleteIngredient,
 };
