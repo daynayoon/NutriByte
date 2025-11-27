@@ -115,6 +115,8 @@ async function insertRecipe(event) {
 
 async function selectCustomerType(event) {
     const typeValue = document.getElementById('customerType').value;
+    const nameValue = document.getElementById('select_name').value;
+    const andOrValue = document.getElementById('and_or').value;
     const tableElement = document.getElementById('customer');
     const tableBody = tableElement.querySelector('tbody');
 
@@ -124,7 +126,9 @@ async function selectCustomerType(event) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            type : typeValue
+            type : typeValue,
+            name: nameValue,
+            andOr: andOrValue
         })
     });
 
@@ -148,7 +152,6 @@ async function selectCustomerType(event) {
 
     if (responseData.success) {
         messageElement.textContent = "Customer type selected successfully!";
-        fetchTableData();
     } else {
         messageElement.textContent = "Error selecting customers!";
     }

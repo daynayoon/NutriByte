@@ -157,35 +157,44 @@ async function fetchCustomerFromDb() {
 // Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
 // (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
 
-async function selectCustomerType(type) {
+async function selectCustomerType(type, name, andOr) {
     return await withOracleDB(async (connection) => {
-        if (type === "recipeCreator") {
-            const result = await connection.execute(
-            `
-                SELECT C.ID, C.name, C.email_address, RC.cookingHistory
-                FROM Customer C
-                JOIN RecipeCreator RC ON C.ID = RC.ID
-                ORDER BY C.ID
-            `
-            );
-            return result.rows;
-        } else if (type === "foodCritic") {
-            const result = await connection.execute(
-                `
-                SELECT C.ID, C.name, C.email_address, FC.ratingHistory
-                FROM Customer C
-                JOIN FoodCritic FC ON C.ID = FC.ID
-                ORDER BY C.ID
-                `
-            );
-            return result.rows;
-        } else {
-            return []; // invalid type
+        // Base SQL: join both tables to get all possible info
+        let SQL = `
+            SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
+            FROM Customer C
+            LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
+            LEFT JOIN FoodCritic FC ON C.ID = FC.ID
+        `;
+
+        // Build conditions array
+        let conditions = [];
+        if (type === "recipeCreator") conditions.push("RC.ID IS NOT NULL");
+        if (type === "foodCritic") conditions.push("FC.ID IS NOT NULL");
+        if (name && name.trim().length > 0) conditions.push("LOWER(TRIM(C.name)) = LOWER(:name)");
+
+        // Append WHERE clause if any conditions exist
+        if (conditions.length > 0) {
+            SQL += " WHERE " + conditions.join(` ${andOr} `);
         }
-    }).catch(() => {
+
+        // Order results
+        SQL += " ORDER BY C.ID";
+
+        // Prepare bind object
+        const binds = (name && name.trim().length > 0) ? { name } : {};
+
+        // Execute query
+        const result = await connection.execute(SQL, binds, { autoCommit: true });
+
+        return result.rows;
+        
+    }).catch((err) => {
+        console.error("selectCustomerType error:", err);
         return [];
     });
 }
+
 
 async function fetchIngredients() {
     return await withOracleDB(async (connection) => {
