@@ -298,19 +298,19 @@ async function updateCustomer(customerId, newName, newEmail) {
         const result = await connection.execute(
             `
             UPDATE Customer
-            SET name = :newName
+            SET name = :newName,
                 email_address = :newEmail
-            WEHRE ID = :CustomerID
+            WHERE ID = :customerId
             `,
             {
-                customerID,
+                customerId,
                 newName,
                 newEmail
             },
-            {autoCommit: true}
+            { autoCommit: true }
         );
-        
-        return result.rowsAffected && result.rowsAffected >0;
+
+        return result.rowsAffected && result.rowsAffected > 0;
     }).catch((err) => {
         console.error("Error updating Customer:", err);
         return false;
