@@ -291,6 +291,81 @@ async function getTopCuisinesByAvgRating() {
     });
 }
 
+// UPDATE, PROJECTION, AGGREGATION WITH HAVING Query Implementation
+// UPDATE: PK: ID
+async function updateCustomer(customerId, newName, newEmail) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `
+            UPDATE Customer
+            SET name = :newName
+                email_address = :newEmail
+            WEHRE ID = :CustomerID
+            `,
+            {
+                customerID,
+                newName,
+                newEmail
+            },
+            {autoCommit: true}
+        );
+        
+        return result.rowsAffected && result.rowsAffected >0;
+    }).catch((err) => {
+        console.error("Error updating Customer:", err);
+        return false;
+    });
+}
+
+// PROJECTION (Ingredient attributes) seelct ID, name or name
+async function projectIngredients(selectedColumns) {
+    return await withOracleDB(async (connection) => {
+        if (!Array.isArray(selectedColumns) || selectedColumns.length === 0) {
+            return [];
+        }
+
+        const columnSQL = selectedColumns.join(", ");
+
+        const result = await connection.execute(
+            `
+            SELECT ${columnSQL}
+            FROM Ingredient
+            ORDER BY ID
+            `,
+            [],
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        return result.rows;
+    }).catch((err) => {
+        console.error("Error in projectIngredients:", err);
+        return [];
+    });
+}
+
+// AGGREGATION with HAVING: recipe title which has average rating >= threshold
+async function getRecipesByMinAvgRating(threshold) {
+    return await withOracleDB(async (connection) => {
+        const result = await connection.execute(
+            `
+            SELECT R.title, AVG(RT.stars) AS avg_rating
+            FROM Recipe R
+            JOIN Rate RT ON R.ID = RT.RecipeID
+            GROUP BY R.ID, R.title
+            HAVING AVG(RT.stars) >= :threshold
+            ORDER BY avg_rating DESC
+            `,
+            { threshold },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+        return result.rows;
+    }).catch((err) => {
+        console.error("Error in getRecipesByMinAvgRating:", err);
+        return [];
+    });
+}
+
+
 module.exports = {
     testOracleConnection,
     fetchRecipeFromDb,
@@ -303,4 +378,7 @@ module.exports = {
     deleteIngredient,
     getCustomersByRecipeAndRating,
     getTopCuisinesByAvgRating,
+    updateCustomer,
+    projectIngredients,
+    getRecipesByMinAvgRating,
 };
