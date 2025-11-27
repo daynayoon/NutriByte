@@ -132,10 +132,10 @@ query: Find and show the number of recipes in each savedList of the owner, along
 sql:
 ```sql
 SELECT SL.ID, SL.name, COUNT(AR.RecipeID) AS RecipeCount
-FROM AddRelation AR, SavedLists SL
-LEFT JOIN AddRelation AR ON SL.ownerID = AR.customerID
-GROUP BY SL.ID
-ORDER BY SL.ID
+FROM SavedLists SL
+LEFT JOIN AddRelation AR ON SL.ID = AR.savedListID
+GROUP BY SL.ID, SL.name
+ORDER BY SL.ID;
 ```
 
 ## AGGREGATION with HAVING
