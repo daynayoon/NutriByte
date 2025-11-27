@@ -5,7 +5,7 @@ body {
     max-width: 800px;
     margin: auto;
     line-height: 1.6;
-    background-color: #99d6ff;
+    background-color: #fbe298;
     text-align: center!important;
     color: #00065e;
 }
@@ -32,7 +32,7 @@ hr {
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #b8dbff;
+    background-color: #cce5ff;
     box-shadow: 0 1px 12px rgba(0, 24, 86, 0.1);
     border-radius: 5px;
 }
@@ -43,7 +43,7 @@ th, td {
 }
 
 th {
-    background-color: #5ca8ff;
+    background-color: #81bcff;
     font-weight: bold;
 }
 
@@ -84,7 +84,7 @@ input, textarea {
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #fff;
-    color: #333;
+    color: #00065e;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
 }
