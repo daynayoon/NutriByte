@@ -213,6 +213,58 @@ async function savedListCountTable() {
     });
 }
 
+async function findAllRecipes(ing1, ing2, ing3, ing4, ing5) {
+    return await withOracleDB(async (connection) => {
+
+        // Put all 5 into an array, lowercase and trim input
+        const inputIngs = [ing1, ing2, ing3, ing4, ing5]
+            .map(x => x ? x.trim().toLowerCase() : "")
+            .filter(x => x.length > 0);   // keep only non-empty
+
+        // If no ingredients → return all recipes
+        if (inputIngs.length === 0) {
+            const result = await connection.execute(
+                `SELECT ID, title FROM Recipe ORDER BY ID`, 
+                {},
+                { autoCommit: true }
+            );
+            return result.rows;
+        }
+
+        // Base SQL
+        let SQL = `
+            SELECT R.ID, R.title
+            FROM Recipe R
+            JOIN Contain C ON R.ID = C.RecipeID
+            JOIN Ingredient I ON C.IngredientID = I.ID
+            WHERE LOWER(TRIM(I.name)) IN (
+        `;
+
+        // Create bind placeholders (:ing0, :ing1, :ing2...)
+        const placeholders = inputIngs.map((_, i) => `:ing${i}`).join(", ");
+        SQL += placeholders + ")";
+
+        // Must match ALL specified ingredients
+        SQL += `
+            GROUP BY R.ID, R.title
+            HAVING COUNT(DISTINCT LOWER(TRIM(I.name))) = :ingCount
+        `;
+
+        // Create bind object
+        const binds = {};
+        inputIngs.forEach((val, i) => binds[`ing${i}`] = val);
+        binds.ingCount = inputIngs.length;
+
+        const result = await connection.execute(SQL, binds, { autoCommit: true });
+        return result.rows;
+
+    }).catch(err => {
+        console.log("Error executing findAllRecipes:", err);
+        return [];
+    });
+}
+
+
 async function fetchIngredients() {
     return await withOracleDB(async (connection) => {
         const result = await connection.execute(
@@ -299,6 +351,7 @@ module.exports = {
     fetchCustomerFromDb,
     selectCustomerType,
     savedListCountTable,
+    findAllRecipes,
     fetchIngredients,
     deleteIngredient,
     getCustomersByRecipeAndRating,
