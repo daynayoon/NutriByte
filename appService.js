@@ -293,77 +293,70 @@ async function getTopCuisinesByAvgRating() {
 
 // UPDATE, PROJECTION, AGGREGATION WITH HAVING Query Implementation
 // UPDATE: PK: ID
-async function updateCustomer(customerId, newName, newEmail) {
+async function updateCustomer(id, newName, newEmail) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `
+        const SQL = `
             UPDATE Customer
             SET name = :newName,
                 email_address = :newEmail
-            WHERE ID = :customerId
-            `,
-            {
-                customerId,
-                newName,
-                newEmail
-            },
-            { autoCommit: true }
-        );
+            WHERE ID = :id
+        `;
 
+        const binds = {
+            newName,
+            newEmail,
+            id
+        };
+
+        const result = await connection.execute(SQL, binds, { autoCommit: true });
         return result.rowsAffected && result.rowsAffected > 0;
     }).catch((err) => {
-        console.error("Error updating Customer:", err);
+        console.error("Error updating customer:", err);
         return false;
     });
 }
 
+
 // PROJECTION (Ingredient attributes) seelct ID, name or name
-async function projectIngredients(selectedColumns) {
+async function projectIngredients(attributes) {
     return await withOracleDB(async (connection) => {
-        if (!Array.isArray(selectedColumns) || selectedColumns.length === 0) {
-            return [];
-        }
+        const columns = attributes.join(", ");
 
-        const columnSQL = selectedColumns.join(", ");
+        const SQL = `SELECT ${columns} FROM Ingredient`;
 
-        const result = await connection.execute(
-            `
-            SELECT ${columnSQL}
-            FROM Ingredient
-            ORDER BY ID
-            `,
-            [],
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
-        );
-
+        const result = await connection.execute(SQL, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
         return result.rows;
     }).catch((err) => {
-        console.error("Error in projectIngredients:", err);
+        console.error("Error projecting ingredients:", err);
         return [];
     });
 }
 
 // AGGREGATION with HAVING: recipe title which has average rating >= threshold
-async function getRecipesByMinAvgRating(threshold) {
+async function getRecipesAboveAvgRating(threshold) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `
+        const SQL = `
             SELECT R.title, AVG(RT.stars) AS avg_rating
             FROM Recipe R
             JOIN Rate RT ON R.ID = RT.RecipeID
             GROUP BY R.ID, R.title
             HAVING AVG(RT.stars) >= :threshold
             ORDER BY avg_rating DESC
-            `,
+        `;
+
+        const result = await connection.execute(
+            SQL,
             { threshold },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
+
         return result.rows;
     }).catch((err) => {
-        console.error("Error in getRecipesByMinAvgRating:", err);
+        console.error("Error in getRecipesAboveAvgRating:", err);
         return [];
     });
 }
+
 
 
 module.exports = {
