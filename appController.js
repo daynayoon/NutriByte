@@ -30,12 +30,16 @@ router.post("/initiate-recipe", async (req, res) => {
 });
 
 router.post("/insert-recipe", async (req, res) => {
-    const { id, title, time_consumed, difficulty, cuisineID} = req.body;
-    const insertResult = await appService.insertRecipe(id, title, time_consumed, difficulty, cuisineID);
-    if (insertResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
+    const { customerID, id, title, time_consumed, difficulty, cuisineID} = req.body;
+    try {
+        const insertResult = await appService.insertRecipe(customerID, id, title, time_consumed, difficulty, cuisineID);
+        if (insertResult) {
+            res.json({ success: true });
+        } else {
+            res.status(400).json({ success: false, message: "Failed to insert recipe. Check your data." });
+        }
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
     }
 });
 
