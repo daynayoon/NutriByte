@@ -183,6 +183,7 @@ async function fetchAndDisplayCustomerType() {
     });
 }
 
+// Count recipes for each owner, saved lists. 
 async function savedListRecipeCount() {
     const tableElement = document.getElementById('savedListCountTable');
     const tableBody = tableElement.querySelector('tbody');
@@ -206,6 +207,63 @@ async function savedListRecipeCount() {
             cell.textContent = field;
         });
     });
+
+    const messageElement = document.getElementById('savedListCountResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "savedList recipes counted successfully!";
+    } else {
+        messageElement.textContent = "Error counting savedList recipes!";
+    }
+}
+
+// Find all recipes 
+async function findAllRecipes(event) {
+    event.preventDefault();
+    const tableElement = document.getElementById('findAllRecipesTable');
+    const tableBody = tableElement.querySelector('tbody');
+    const ing1Value = document.getElementById('ingone').value;
+    const ing2Value = document.getElementById('ingtwo').value;
+    const ing3Value = document.getElementById('ingthree').value;
+    const ing4Value = document.getElementById('ingfour').value;
+    const ing5Value = document.getElementById('ingfive').value;
+
+    const response = await fetch('/findAllRecipesTable', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            ing1: ing1Value,
+            ing2: ing2Value,
+            ing3: ing3Value,
+            ing4: ing4Value,
+            ing5: ing5Value
+        })
+    });
+
+    const responseData = await response.json();
+    const demotableContent = responseData.data;
+
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    demotableContent.forEach(user => {
+        const row = tableBody.insertRow();
+        user.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+    });
+
+    const messageElement = document.getElementById('findAllRecipeResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "found all recipes with selected ingredients successfully!";
+    } else {
+        messageElement.textContent = "Error finding all recipes with selected ingredients!";
+    }
 }
 
 // ---------------------------------------------------------------
@@ -218,6 +276,7 @@ window.onload = function() {
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
+    document.getElementById("findAllRecipes").addEventListener("submit", findAllRecipes);
 };
 
 // General function to refresh the displayed table data. 

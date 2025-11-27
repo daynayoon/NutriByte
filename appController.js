@@ -65,6 +65,16 @@ router.post("/savedListCountTable", async (req, res) => {
     }
 });
 
+router.post("/findAllRecipesTable", async (req, res) => {
+    const { ing1, ing2, ing3, ing4, ing5 } = req.body;
+    const findAllRecipesTableResult = await appService.findAllRecipes(ing1, ing2, ing3, ing4, ing5);
+    if (findAllRecipesTableResult) {
+        res.json({ data: findAllRecipesTableResult, success: true});
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+
 router.get('/ingredients', async (req, res) => {
     const ingredients = await appService.fetchIngredients();
     res.json({ data: ingredients });
