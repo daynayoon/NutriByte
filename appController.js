@@ -96,4 +96,48 @@ router.get('/top-cuisines', async (req, res) => {
     res.json({ data: rows });
 });
 
+// UPDATE Customer info
+router.put('/customer/:id', async (req, res) => {
+    const customerID = req.params.id;
+    const { newName, newEmail } = req.body;
+
+    if (!newName && !newEmail) {
+        return res.status(400).json({ success: false, message: "Nothing to update." });
+    }
+
+    const success = await appService.updateCustomer(customerID, newName, newEmail);
+
+    if (success) {
+        res.json({ success: true, message: "Customer updated successfully." });
+    } else {
+        res.status(400).json({ success: false, message: "Failed to update customer." });
+    }
+});
+
+// PROJECTION: Return only selected Ingredient attributes
+router.post('/ingredients/projection', async (req, res) => {
+    const { attributes } = req.body;
+
+    if (!attributes || attributes.length === 0) {
+        return res.status(400).json({ success: false, message: "No attributes selected." });
+    }
+
+    const rows = await appService.projectIngredients(attributes);
+    res.json({ data: rows });
+});
+
+// HAVING: recipe that ave rating >= threshold
+router.post('/recipes/avg-rating', async (req, res) => {
+    const { threshold } = req.body;
+
+    if (threshold === undefined) {
+        return res.status(400).json({ success: false, message: "threshold is required." });
+    }
+
+    const rows = await appService.getRecipesAboveAvgRating(threshold);
+    res.json({ data: rows });
+});
+
+
+
 module.exports = router;
