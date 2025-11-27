@@ -81,7 +81,7 @@ async function resetRecipe() {
 // Inserts new records into the Recipe.
 async function insertRecipe(event) {
     event.preventDefault();
-
+    const customerIDValue = document.getElementById('insertCustomerID').value;
     const idValue = document.getElementById('insertId').value;
     const titleValue = document.getElementById('insertTitle').value;
     const time_consumedValue = document.getElementById('insertTimeConsumed').value;
@@ -94,6 +94,7 @@ async function insertRecipe(event) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            customerID: customerIDValue,
             id: idValue,
             title: titleValue,
             time_consumed: time_consumedValue,
@@ -109,7 +110,7 @@ async function insertRecipe(event) {
         messageElement.textContent = "Recipe created successfully!";
         fetchTableData();
     } else {
-        messageElement.textContent = "Error creating recipe!";
+        messageElement.textContent = responseData.message || "Error creating recipe!";
     }
 }
 

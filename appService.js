@@ -122,19 +122,40 @@ async function initiateRecipe() {
     });
 }
 
-async function insertRecipe(id, title, time_consumed, difficulty, cuisineID) {
+async function insertRecipe(customerID, id, title, time_consumed, difficulty, cuisineID) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `INSERT INTO Recipe (id, title, time_consumed, difficulty, cuisineID) 
-            VALUES (:id, :title, :time_consumed, :difficulty, :cuisineID)`,
-            [id, title, time_consumed, difficulty, cuisineID],
-            { autoCommit: true }
+        const condition = await connection.execute(
+            `SELECT C.name FROM Customer C WHERE C.ID = :customerID`,
+            [customerID]
         );
 
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch((err) => {
-        console.error("Error inserting into Recipe table:", err);
-        return false;
+        if (condition.rows.length === 0) {
+            throw new Error("Customer ID does not exist.");
+        }
+
+        try {
+            const result = await connection.execute(
+                `INSERT INTO Recipe (id, title, time_consumed, difficulty, cuisineID) 
+                 VALUES (:id, :title, :time_consumed, :difficulty, :cuisineID)`,
+                [id, title, time_consumed, difficulty, cuisineID],
+                { autoCommit: true }
+            );
+
+            await connection.execute(
+                `INSERT INTO AddRelation (CustomerID, RecipeID)
+                 VALUES (:customerID, :id)`,
+                [customerID, id],
+                { autoCommit: true }
+            );
+
+            return result.rowsAffected && result.rowsAffected > 0;
+
+        } catch (err) {
+            if (err.errorNum === 1) { // ORA-00001
+                throw new Error("Recipe title must be unique.");
+            }
+            throw err; // rethrow other errors
+        }
     });
 }
 
