@@ -56,6 +56,15 @@ router.post("/select-customer", async (req, res) => {
     }
 });
 
+router.post("/savedListCountTable", async (req, res) => {
+    const savedListCountTableResult = await appService.savedListCountTable();
+    if (savedListCountTableResult) {
+        res.json({ data: savedListCountTableResult, success: true });
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+
 router.get('/ingredients', async (req, res) => {
     const ingredients = await appService.fetchIngredients();
     res.json({ data: ingredients });

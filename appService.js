@@ -195,6 +195,23 @@ async function selectCustomerType(type, name, andOr) {
     });
 }
 
+async function savedListCountTable() {
+    return await withOracleDB(async (connection) => {
+        try {
+            const result = await connection.execute(`
+                SELECT S.name AS savedListName, C.name AS ownerName, COUNT(S.recipeID) AS recipeCount
+                FROM SavedLists S
+                JOIN Customer C ON S.ownerID = C.ID
+                GROUP BY S.name, C.name, S.ownerID
+                ORDER BY C.name, S.name
+            `);
+            return result.rows;
+        } catch (err) {
+            console.log("Error executing savedListCountTable:", err);
+            return [];
+        }
+    });
+}
 
 async function fetchIngredients() {
     return await withOracleDB(async (connection) => {
@@ -281,6 +298,7 @@ module.exports = {
     insertRecipe, 
     fetchCustomerFromDb,
     selectCustomerType,
+    savedListCountTable,
     fetchIngredients,
     deleteIngredient,
     getCustomersByRecipeAndRating,

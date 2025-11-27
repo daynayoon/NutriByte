@@ -183,6 +183,30 @@ async function fetchAndDisplayCustomerType() {
     });
 }
 
+async function savedListRecipeCount() {
+    const tableElement = document.getElementById('savedListCountTable');
+    const tableBody = tableElement.querySelector('tbody');
+
+    const response = await fetch('/savedListCountTable', {
+        method: 'POST'
+    });
+
+    const responseData = await response.json();
+    const demotableContent = responseData.data;
+
+    // Always clear old, already fetched data before new fetching process.
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    demotableContent.forEach(user => {
+        const row = tableBody.insertRow();
+        user.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+    });
+}
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
@@ -193,6 +217,7 @@ window.onload = function() {
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
+    document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
 };
 
 // General function to refresh the displayed table data. 
