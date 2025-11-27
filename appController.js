@@ -46,11 +46,13 @@ router.get('/customer', async (req, res) => {
 
 router.post("/select-customer", async (req, res) => {
     const type = req.body.type;
-    const selectCustomerResult = await appService.selectCustomerType(type);
+    const name = req.body.name;
+    const andOr = req.body.andOr;
+    const selectCustomerResult = await appService.selectCustomerType(type, name, andOr);
     if (selectCustomerResult) {
-        res.json({ success: true, data: selectCustomerResult });
+        res.json({ data: selectCustomerResult, success: true });
     } else {
-        res.status(500).json({ success: false });
+        res.status(404).json({ success: false });
     }
 });
 
