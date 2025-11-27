@@ -59,7 +59,7 @@ WHERE ID = <ID>;
 ```
 
 ## SELECTION
-Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
+Query: SELECT FoodCritic or RecipeCreator and/or name.  Show all customer information that match those conditions.
 (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
 
 sql:
@@ -74,6 +74,18 @@ FROM Customer C
 JOIN FoodCritic FC ON C.ID = FC.ID
 ORDER BY C.ID
 ```
+with name:
+```sql
+SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
+   FROM Customer C
+   LEFT JOIN RecipeCreator RC ON C.ID = RC.ID
+   LEFT JOIN FoodCritic FC ON C.ID = FC.ID
+   WHERE C.name = :name
+   ORDER BY C.ID,
+  [name],
+  { autoCommit: false }
+```
+
 ## PROJECTION
 Query: Show only the selected attributes of the Ingredient relatino based on user selection.
 relation: Ingredient
