@@ -29,7 +29,8 @@ CREATE TABLE SavedLists (
   ID INTEGER,
   name CHAR(50),
   ownerID INTEGER NOT NULL,
-  UNIQUE (ownerID, name),
+  recipeID INTEGER NOT NULL,
+  UNIQUE (ownerID, name, recipeID),
   PRIMARY KEY (ID),
   FOREIGN KEY (ownerID) REFERENCES Customer(ID)
 );
@@ -193,11 +194,13 @@ INSERT INTO FoodCritic VALUES (4, 'Cares about presentation');
 INSERT INTO FoodCritic VALUES (5, 'Values ingredient quality');
 INSERT INTO FoodCritic VALUES (100, 'food criticizing professional');
 
-INSERT INTO SavedLists VALUES (1, 'Favorites', 1);
-INSERT INTO SavedLists VALUES (2, 'To Try', 2);
-INSERT INTO SavedLists VALUES (3, 'High Protein', 3);
-INSERT INTO SavedLists VALUES (4, 'Spicy Food', 4);
-INSERT INTO SavedLists VALUES (5, 'Comfort Meals', 5);
+INSERT INTO SavedLists VALUES (1, 'Favorites', 1, 1);
+INSERT INTO SavedLists VALUES (2, 'To Try', 2, 2);
+INSERT INTO SavedLists VALUES (12, 'Favorites', 2, 5);
+INSERT INTO SavedLists VALUES (3, 'High Protein', 3, 3);
+INSERT INTO SavedLists VALUES (13, 'High Protein', 3, 6);
+INSERT INTO SavedLists VALUES (4, 'Spicy Food', 4, 1);
+INSERT INTO SavedLists VALUES (5, 'Comfort Meals', 5, 2);
 
 INSERT INTO Cuisine VALUES (1, 'Japanese');
 INSERT INTO Cuisine VALUES (2, 'Italian');
