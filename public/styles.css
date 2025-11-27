@@ -1,16 +1,30 @@
 /* GLOBAL STYLES */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "Lucida Grande", Tahoma;
     padding: 40px;
     max-width: 800px;
     margin: auto;
     line-height: 1.6;
     background-color: #99d6ff;
-    color: #313131;
+    text-align: center!important;
+    color: #00065e;
 }
+
+h1 {
+    font-family: "Lucida Grande", Tahoma;
+	font-size: 60px;
+	font-weight: lighter;
+	font-variant: normal;
+	text-transform: uppercase;
+	color: #00065e;
+    margin-top: 10px;
+	text-align: center!important;
+	letter-spacing: 0.3em;
+} 
 
 hr {
     border-top: 2px solid rgb(44, 51, 62);
+    text-transform: uppercase;
     margin: auto;
 }
 
@@ -18,8 +32,8 @@ hr {
 table {
     width: 100%;
     border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 1px 12px rgba(0, 0, 0, 0.1);
+    background-color: #b8dbff;
+    box-shadow: 0 1px 12px rgba(0, 24, 86, 0.1);
     border-radius: 5px;
 }
 
@@ -29,7 +43,7 @@ th, td {
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #5ca8ff;
     font-weight: bold;
 }
 
