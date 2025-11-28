@@ -159,8 +159,11 @@ async function selectCustomerType(event) {
 
 // Fetch and display customer type and information
 async function fetchAndDisplayCustomerType() {
-    const tableElement = document.getElementById('customer');
-    const tableBody = tableElement.querySelector('tbody');
+    const tableElement1 = document.getElementById('customer');
+    const tableBody1 = tableElement1.querySelector('tbody');
+
+    const tableElement2 = document.getElementById('customerUpdateTable');
+    const tableBody2 = tableElement2.querySelector('tbody');
 
     const response = await fetch('/customer', {
         method: 'GET'
@@ -170,15 +173,19 @@ async function fetchAndDisplayCustomerType() {
     const demotableContent = responseData.data;
 
     // Always clear old, already fetched data before new fetching process.
-    if (tableBody) {
-        tableBody.innerHTML = '';
-    }
+    tableBody1.innerHTML = '';
+    tableBody2.innerHTML = '';
+
 
     demotableContent.forEach(user => {
-        const row = tableBody.insertRow();
+        const row1 = tableBody1.insertRow();
         user.forEach((field, index) => {
-            const cell = row.insertCell(index);
-            cell.textContent = field;
+            row1.insertCell(index).textContent = field;
+        });
+
+        const row2 = tableBody2.insertRow();
+        user.forEach((field, index) => {
+            row2.insertCell(index).textContent = field;
         });
     });
 }
@@ -208,6 +215,41 @@ async function savedListRecipeCount() {
     });
 }
 
+// UPDATE (Query 2)
+async function updateCustomer() {
+    const id = document.getElementById("updateCustomerID").value;
+    const newName = document.getElementById("updateCustomerName").value;
+    const newEmail = document.getElementById("updateCustomerEmail").value;
+    const msg = document.getElementById("updateCustomerMsg");
+
+    msg.textContent = ""; 
+
+    if (!id) {
+        msg.textContent = "Customer ID is required.";
+        return;
+    }
+
+    if (!newName && !newEmail) {
+        msg.textContent = "Enter a name or email to update.";
+        return;
+    }
+
+    const response = await fetch(`/customer/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ newName, newEmail })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+        msg.textContent = "Customer updated successfully!";
+        fetchAndDisplayCustomerType();  
+    } else {
+        msg.textContent = data.message || "Failed to update customer.";
+    }
+}
+
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
@@ -218,6 +260,7 @@ window.onload = function() {
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
+    document.getElementById("updateCustomerBtn").addEventListener("click", updateCustomer);
 };
 
 // General function to refresh the displayed table data. 
