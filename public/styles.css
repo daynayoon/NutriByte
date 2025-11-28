@@ -5,7 +5,7 @@ body {
     max-width: 800px;
     margin: auto;
     line-height: 1.6;
-    background-color: beige;
+    background-color: rgb(248, 249, 252);
     text-align: center!important;
     color: #00065e;
 }
@@ -57,7 +57,7 @@ tr:hover {
 }
 
 button {
-    background-color: #5b311d;
+    background-color: #1d435b;
     color: #fff;
     padding: 10px 20px;
     font-size: 16px;
@@ -69,11 +69,11 @@ button {
 }
 
 button:hover {
-    background-color: #946d40;
+    background-color: #404894;
 }
 
 button:active {
-    background-color: #754422;
+    background-color: #223875;
 }
 
 /* INPUT STYLES */
