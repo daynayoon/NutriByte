@@ -87,28 +87,31 @@ SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
 ```
 
 ## PROJECTION
-Query: Show only the selected attributes of the Ingredient relatino based on user selection.
-relation: Ingredient
+Query: Show only the selected attributes of the Recipe relatino based on user selection.
+relation: Recipe
 attributes:
     ID: INTEGER
-    name: CHAR(100)
-User input: User selects which attributes to display (ID, name, or both)
+    title: CHAR
+    time_consumed: INTEGER
+    difficulty: CHAR
+    cuisineID: INTEGER
+User input: User selects which attributes to display (any subset)
 
 sql:
-- If user selects both:
+- If user selects ID+title:
 ```sql
-SELECT ID, name
-FROM Ingredient;
+SELECT ID, title
+FROM Recipe;
 ```
-- If user select only name:
+- If user select title + difficulty + cuisineID:
 ```sql
-SELECT name
-FROM Ingredient;
+SELECT title, difficulty, cuisineID
+FROM Recipe;
 ```
-- If user select only ID:
+- If user select all:
 ```sql
-SELECT ID
-FROM Ingredient;
+SELECT ID, title, time_consumed, difficulty, cuisineID
+FROM Recipe;
 ```
 
 

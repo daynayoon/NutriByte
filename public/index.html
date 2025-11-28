@@ -70,6 +70,44 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
+    <h2>Query 2: Update Customer Info</h2>
+
+    <table id="customerUpdateTable" border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email Address</th>
+            <th>Cooking History</th>
+            <th>Rating History</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+    </table>
+
+    <br><br>
+
+    <p>Select a customer and update their name or email address.</p>
+
+    Customer ID:
+    <input type="number" id="updateCustomerID" placeholder="Enter Customer ID">
+    <br><br>
+
+    New Name:
+    <input type="text" id="updateCustomerName" placeholder="Enter New Name">
+    <br><br>
+
+    New Email:
+    <input type="text" id="updateCustomerEmail" placeholder="Enter New Email">
+    <br><br>
+
+    <button id="updateCustomerBtn">Update Customer</button>
+
+    <div id="updateCustomerMsg"></div>
+
+
+    <br><hr><br> <!-- ========================================================================= -->
+
     <h2>Query 4: Select Customer Type</h2>
 
     <!-- Show 'Customer'. 
@@ -113,6 +151,53 @@
     <div id="customerSelectionResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
+
+    <h2>Query 5: Projection on Recipe</h2>
+
+    <p>Select attributes to display:</p>
+
+    <div class="attribute-container">
+        <div class="projection-row">
+            <span>ID</span>
+            <input type="checkbox" class="projAttr" value="ID">
+        </div>
+
+        <div class="projection-row">
+            <span>Title</span>
+            <input type="checkbox" class="projAttr" value="title">
+        </div>
+
+        <div class="projection-row">
+            <span>Time Consumed</span>
+            <input type="checkbox" class="projAttr" value="time_consumed">
+        </div>
+
+        <div class="projection-row">
+            <span>Difficulty</span>
+            <input type="checkbox" class="projAttr" value="difficulty">
+        </div>
+
+        <div class="projection-row">
+            <span>Cuisine ID</span>
+            <input type="checkbox" class="projAttr" value="cuisineID">
+        </div>
+    </div>
+
+    <button onclick="runRecipeProjection()">Run Projection</button>
+
+    <div id="projectionMsg"></div>
+
+    <br>
+
+    <table id="projectionRecipeTable" border="1">
+        <thead><tr id="projectionHeader"></tr></thead>
+        <tbody id="projectionBody"></tbody>
+    </table>
+
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+
 
     <h2>Query 7: Count recipes in savedlists</h2>
 
@@ -202,6 +287,30 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
+    <h2>Query 8: Aggregation with HAVING</h2>
+    <h3>(Recipes with Avg Rating ≥ Threshold)</h3>
+
+    <p>Enter rating threshold:</p>
+    <input type="number" step="0.1" id="havingThreshold" placeholder="e.g., 4.0">
+
+    <br><br>
+    <button onclick="runHavingQuery()">Run HAVING Query</button>
+
+    <div id="havingMsg"></div>
+
+    <br>
+
+    <table id="havingTable" border="1">
+        <thead>
+            <tr id="havingHeader">
+                <th>Recipe Title</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody id="havingBody"></tbody>
+    </table>
+
+    <br><hr><br> <!-- ===================================================================================== -->
     <!-- Nested Aggregation: cuisines with highest average rating -->
     <h2>Query 11: Top Cuisines by Average Rating (Nested Aggregation)</h2>
 
@@ -220,6 +329,7 @@
     <div id="topCuisinesMsg"></div>
 
     <!-- ===================================================================================== -->
+
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
     <script src="scripts.js"></script>
 </body>
