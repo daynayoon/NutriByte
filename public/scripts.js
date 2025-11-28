@@ -161,6 +161,8 @@ async function selectCustomerType(event) {
 // Fetch and display ingredient table
 async function fetchAllIngredients() {
     const table = document.getElementById("allIngredients");
+    if (!table) return;
+    
     const body = table.querySelector("tbody");
 
     const res = await fetch("/ingredients", { method: "GET" });
@@ -546,14 +548,14 @@ async function runHavingQuery() {
 window.onload = function() {
     checkDbConnection();
     fetchTableData();
-    fetchAllIngredients();
+    // fetchAllIngredients();
     fetchAndDisplayIngredients();
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
     document.getElementById("updateCustomerBtn").addEventListener("click", updateCustomer);
-    document.getElementById("projectionBtn").addEventListener("click", projectIngredients);
+    // document.getElementById("projectionBtn").addEventListener("click", projectIngredients);
     document.getElementById("findAllRecipes").addEventListener("submit", findAllRecipes);
     document.getElementById("customersByRecipeForm").addEventListener("submit", customersByRecipe);
     document.getElementById("loadTopCuisines").addEventListener("click", loadTopCuisines);
