@@ -43,7 +43,7 @@ th, td {
 }
 
 th {
-    background-color: #f7f7e9;
+    background-color: #e9eff7;
     font-weight: bold;
 }
 
@@ -52,7 +52,7 @@ tr:last-child td {
 }
 
 tr:hover {
-    background-color: #f0f0e2;
+    background-color: #dee5ee;
     cursor: pointer;
 }
 
