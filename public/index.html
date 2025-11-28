@@ -159,6 +159,66 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
+    <!-- DELETE: show ingredients with delete buttons -->
+    <h2>Query 8: Delete Ingredient</h2>
+    <p>Click “delete” to remove an ingredient.</p>
+
+    <table id="ingredientTable" border="1" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th>Ingredient ID</th>
+                <th>Ingredient Name</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="deleteIngredientMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <!-- JOIN: customers who rated a given recipe with >= minStars -->
+    <h2>Query 9: Customers By Recipe and Rating (JOIN)</h2>
+
+    <form id="customersByRecipeForm">
+        Recipe Title: <input type="text" id="recipeTitleInput" placeholder="Enter recipe title" required> <br><br>
+        Minimum Stars: <input type="number" id="minStarsInput" placeholder="1–5" min="1" max="5" required> <br><br>
+        <button type="submit"> search </button>
+    </form>
+
+    <table id="customersByRecipeTable" border="1" style="margin-top:10px; display:none;">
+        <thead>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>email_address</th>
+                <th>stars</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="customersByRecipeMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <!-- Nested Aggregation: cuisines with highest average rating -->
+    <h2>Query 11: Top Cuisines by Average Rating (Nested Aggregation)</h2>
+
+    <button id="loadTopCuisines">show top cuisines</button>
+
+    <table id="topCuisinesTable" border="1" style="margin-top:10px; display:none;">
+        <thead>
+            <tr>
+                <th>Cuisine Style</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="topCuisinesMsg"></div>
+
     <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
     <script src="scripts.js"></script>
