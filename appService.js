@@ -132,7 +132,25 @@ async function insertRecipe(customerID, id, title, time_consumed, difficulty, cu
         );
 
         if (condition.rows.length === 0) {
-            throw new Error("Customer ID does not exist.");
+            throw new Error("Customer ID does not exist!");
+        }
+
+        const condition2 = await connection.execute(
+            `SELECT R.ID FROM Recipe R WHERE R.ID = :id`,
+            [id]
+        );
+
+        if (condition2.rows.length > 0) {
+            throw new Error("Recipe ID already exists. Choose different recipeID!");
+        }
+
+        const condition3 = await connection.execute(
+            `SELECT R.title FROM Recipe R WHERE LOWER(TRIM(R.title)) = LOWER(:title)`,
+            [title]
+        );
+
+        if (condition3.rows.length > 0) {
+            throw new Error("Recipe title already used. Choose different recipe title!");
         }
 
         try {
@@ -152,11 +170,8 @@ async function insertRecipe(customerID, id, title, time_consumed, difficulty, cu
 
             return result.rowsAffected && result.rowsAffected > 0;
 
-        } catch (err) {
-            if (err.errorNum === 1) { // ORA-00001
-                throw new Error("Recipe title must be unique.");
-            }
-            throw err; // rethrow other errors
+        } catch {
+            return false; // rethrow other errors
         }
     });
 }
