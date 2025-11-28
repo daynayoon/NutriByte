@@ -30,12 +30,16 @@ router.post("/initiate-recipe", async (req, res) => {
 });
 
 router.post("/insert-recipe", async (req, res) => {
-    const { id, title, time_consumed, difficulty, cuisineID} = req.body;
-    const insertResult = await appService.insertRecipe(id, title, time_consumed, difficulty, cuisineID);
-    if (insertResult) {
-        res.json({ success: true });
-    } else {
-        res.status(500).json({ success: false });
+    const { customerID, id, title, time_consumed, difficulty, cuisineID} = req.body;
+    try {
+        const insertResult = await appService.insertRecipe(customerID, id, title, time_consumed, difficulty, cuisineID);
+        if (insertResult) {
+            res.json({ success: true });
+        } else {
+            res.status(400).json({ success: false, message: "Failed to insert recipe. Check your data." });
+        }
+    } catch (err) {
+        res.status(400).json({ success: false, message: err.message });
     }
 });
 
@@ -60,6 +64,16 @@ router.post("/savedListCountTable", async (req, res) => {
     const savedListCountTableResult = await appService.savedListCountTable();
     if (savedListCountTableResult) {
         res.json({ data: savedListCountTableResult, success: true });
+    } else {
+        res.status(404).json({ success: false });
+    }
+});
+
+router.post("/findAllRecipesTable", async (req, res) => {
+    const { ing1, ing2, ing3, ing4, ing5 } = req.body;
+    const findAllRecipesTableResult = await appService.findAllRecipes(ing1, ing2, ing3, ing4, ing5);
+    if (findAllRecipesTableResult) {
+        res.json({ data: findAllRecipesTableResult, success: true});
     } else {
         res.status(404).json({ success: false });
     }

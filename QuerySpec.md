@@ -179,14 +179,21 @@ HAVING AVG(R.stars) >= ALL (
 ```
 
 ## DIVISION
-query: Find the customer ID of the Recipe Creator whose recipe has an average rating of > 4.5
+query: Find recipes that contain all ingredients selected by the user.
 
 sql:
 ```sql
-SELECT C.ID, C.name
-FROM Customer C, AddRelation AR, Rate RT
-JOIN AddRelation AR ON C.ID = AR.customerID
-JOIN Rate RT ON AR.recipeID = R.ID
-GROUP BY C.ID
-HAVING AVG(stars) > 4.5
+SELECT R.ID, R.title
+FROM Recipe R
+WHERE NOT EXISTS (
+    SELECT I.ID
+    FROM Ingredient I
+    WHERE I.ID IN (:ing1, :ing2, :ing3, ...)
+    AND NOT EXISTS (
+        SELECT 1
+        FROM Contain C
+        WHERE C.RecipeID = R.ID
+        AND C.IngredientID = I.ID
+    )
+);
 ```

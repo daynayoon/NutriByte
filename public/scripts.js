@@ -81,7 +81,7 @@ async function resetRecipe() {
 // Inserts new records into the Recipe.
 async function insertRecipe(event) {
     event.preventDefault();
-
+    const customerIDValue = document.getElementById('insertCustomerID').value;
     const idValue = document.getElementById('insertId').value;
     const titleValue = document.getElementById('insertTitle').value;
     const time_consumedValue = document.getElementById('insertTimeConsumed').value;
@@ -94,6 +94,7 @@ async function insertRecipe(event) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
+            customerID: customerIDValue,
             id: idValue,
             title: titleValue,
             time_consumed: time_consumedValue,
@@ -109,7 +110,7 @@ async function insertRecipe(event) {
         messageElement.textContent = "Recipe created successfully!";
         fetchTableData();
     } else {
-        messageElement.textContent = "Error creating recipe!";
+        messageElement.textContent = responseData.message || "Error creating recipe!";
     }
 }
 
@@ -210,6 +211,7 @@ async function fetchAndDisplayCustomerType() {
     });
 }
 
+// Count recipes for each owner, saved lists. 
 async function savedListRecipeCount() {
     const tableElement = document.getElementById('savedListCountTable');
     const tableBody = tableElement.querySelector('tbody');
@@ -233,6 +235,182 @@ async function savedListRecipeCount() {
             cell.textContent = field;
         });
     });
+
+    const messageElement = document.getElementById('savedListCountResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "savedList recipes counted successfully!";
+    } else {
+        messageElement.textContent = "Error counting savedList recipes!";
+    }
+}
+
+// Find all recipes 
+async function findAllRecipes(event) {
+    event.preventDefault();
+    const tableElement = document.getElementById('findAllRecipesTable');
+    const tableBody = tableElement.querySelector('tbody');
+    const ing1Value = document.getElementById('ingone').value;
+    const ing2Value = document.getElementById('ingtwo').value;
+    const ing3Value = document.getElementById('ingthree').value;
+    const ing4Value = document.getElementById('ingfour').value;
+    const ing5Value = document.getElementById('ingfive').value;
+
+    const response = await fetch('/findAllRecipesTable', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            ing1: ing1Value,
+            ing2: ing2Value,
+            ing3: ing3Value,
+            ing4: ing4Value,
+            ing5: ing5Value
+        })
+    });
+
+    const responseData = await response.json();
+    const demotableContent = responseData.data;
+
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    demotableContent.forEach(user => {
+        const row = tableBody.insertRow();
+        user.forEach((field, index) => {
+            const cell = row.insertCell(index);
+            cell.textContent = field;
+        });
+    });
+
+    const messageElement = document.getElementById('findAllRecipeResultMsg');
+
+    if (responseData.success) {
+        messageElement.textContent = "found all recipes with selected ingredients successfully!";
+    } else {
+        messageElement.textContent = "Error finding all recipes with selected ingredients!";
+    }
+}
+
+
+/* DELETE: ingredient table + delete button */
+async function fetchAndDisplayIngredients() {
+    const tableElement = document.getElementById('ingredientTable');
+    if (!tableElement) return;
+    const tableBody = tableElement.querySelector('tbody');
+
+    const response = await fetch('/ingredients', { method: 'GET' });
+    const responseData = await response.json();
+    const data = responseData.data; // objects with ID, NAME
+
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    data.forEach(row => {
+        const tr = tableBody.insertRow();
+
+        const idCell = tr.insertCell();
+        idCell.textContent = row.ID;
+
+        const nameCell = tr.insertCell();
+        nameCell.textContent = row.NAME;
+
+        const actionCell = tr.insertCell();
+        const btn = document.createElement('button');
+        btn.textContent = 'delete';
+        btn.onclick = () => deleteIngredient(row.ID);
+        actionCell.appendChild(btn);
+    });
+}
+
+async function deleteIngredient(id) {
+    const msg = document.getElementById('deleteIngredientMsg');
+
+    const response = await fetch(`/ingredient/${id}`, {
+        method: 'DELETE'
+    });
+
+    const data = await response.json();
+    if (response.ok && data.success) {
+        msg.textContent = `Ingredient ${id} deleted successfully.`;
+        fetchAndDisplayIngredients();
+    } else {
+        msg.textContent = data.message || 'Failed to delete ingredient.';
+    }
+}
+
+/* JOIN: customers by recipe and min rating */
+
+async function customersByRecipe(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('recipeTitleInput').value;
+    const minStars = document.getElementById('minStarsInput').value;
+
+    const response = await fetch('/customers-by-recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeTitle: title, minStars: Number(minStars) })
+    });
+
+    const data = await response.json();
+    const msg = document.getElementById('customersByRecipeMsg');
+    const table = document.getElementById('customersByRecipeTable');
+    const tbody = table.querySelector('tbody');
+
+    if (!response.ok) {
+        msg.textContent = data.message || 'Error running query.';
+        table.style.display = 'none';
+        return;
+    }
+
+    msg.textContent = '';
+    if (tbody) tbody.innerHTML = '';
+
+    data.data.forEach(row => {
+        const tr = tbody.insertRow();
+        const values = [row.ID, row.NAME, row.EMAIL_ADDRESS, row.STARS];
+        values.forEach(v => {
+            const cell = tr.insertCell();
+            cell.textContent = v;
+        });
+    });
+
+    table.style.display = 'table';
+}
+
+/* Nested Aggregation: top cuisines */
+
+async function loadTopCuisines() {
+    const response = await fetch('/top-cuisines', { method: 'GET' });
+    const data = await response.json();
+
+    const msg = document.getElementById('topCuisinesMsg');
+    const table = document.getElementById('topCuisinesTable');
+    const tbody = table.querySelector('tbody');
+
+    if (!response.ok) {
+        msg.textContent = data.message || 'Error loading cuisines.';
+        table.style.display = 'none';
+        return;
+    }
+
+    msg.textContent = '';
+    if (tbody) tbody.innerHTML = '';
+
+    data.data.forEach(row => {
+        const tr = tbody.insertRow();
+        const styleCell = tr.insertCell();
+        const avgCell = tr.insertCell();
+
+        styleCell.textContent = row.STYLE;
+        avgCell.textContent = row.AVGCUISINERATING;
+    });
+
+    table.style.display = 'table';
 }
 
 // UPDATE (Query 2)
@@ -369,12 +547,16 @@ window.onload = function() {
     checkDbConnection();
     fetchTableData();
     fetchAllIngredients();
+    fetchAndDisplayIngredients();
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
     document.getElementById("updateCustomerBtn").addEventListener("click", updateCustomer);
     document.getElementById("projectionBtn").addEventListener("click", projectIngredients);
+    document.getElementById("findAllRecipes").addEventListener("submit", findAllRecipes);
+    document.getElementById("customersByRecipeForm").addEventListener("submit", customersByRecipe);
+    document.getElementById("loadTopCuisines").addEventListener("click", loadTopCuisines);
 };
 
 // General function to refresh the displayed table data. 
