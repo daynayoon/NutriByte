@@ -349,7 +349,7 @@ async function deleteIngredient(id) {
 async function customersByRecipe(event) {
     event.preventDefault();
 
-    const title = document.getElementById('recipeTitleInput').value;
+    const title = document.getElementById('recipeTitleInput').value.trim();
     const minStars = document.getElementById('minStarsInput').value;
 
     const response = await fetch('/customers-by-recipe', {
@@ -371,6 +371,12 @@ async function customersByRecipe(event) {
 
     msg.textContent = '';
     if (tbody) tbody.innerHTML = '';
+
+    if (!data.data || data.data.length === 0) {
+        msg.textContent = 'No customers found for that recipe and rating.';
+        table.style.display = 'none';
+        return;
+    }
 
     data.data.forEach(row => {
         const tr = tbody.insertRow();
