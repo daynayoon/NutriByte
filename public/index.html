@@ -105,6 +105,23 @@
 
     <div id="updateCustomerMsg"></div>
 
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <!-- DELETE: show ingredients with delete buttons -->
+    <h2>Query 3: Delete Ingredient</h2>
+    <p>Click “delete” to remove an ingredient.</p>
+
+    <table id="ingredientTable" border="1" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th>Ingredient ID</th>
+                <th>Ingredient Name</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="deleteIngredientMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
 
@@ -194,76 +211,10 @@
         <tbody id="projectionBody"></tbody>
     </table>
 
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-
-
-    <h2>Query 7: Count recipes in savedlists</h2>
-
-    <button type="submit" id="savedListCountBtn">Show Recipe Counts per Saved List</button>
-
-    <table id="savedListCountTable" border="1" style="margin-top:10px">
-        <thead>
-            <tr>
-                <th>SavedList Name</th>
-                <th>Owner Name</th>
-                <th>Recipe Count</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div id="savedListCountResultMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 10: Find recipe with all ingredients</h2>
-
-    <form id="findAllRecipes">
-        ingredient1: <input type="text" id="ingone" placeholder="Enter first ingredient" maxlength="50"> <br><br>
-        ingredient2: <input type="text" id="ingtwo" placeholder="Enter second ingredient" maxlength="50"> <br><br>
-        ingredient3: <input type="text" id="ingthree" placeholder="Enter third ingredient" maxlength="50"> <br><br>
-        ingredient4: <input type="text" id="ingfour" placeholder="Enter fourth ingredient" maxlength="50"> <br><br>
-        ingredient5: <input type="text" id="ingfive" placeholder="Enter fifth ingredient" maxlength="50"> <br><br>
-
-        <button type="submit"> find recipes </button> <br>
-    </form>
-
-    <table id="findAllRecipesTable" border="1" style="margin-top:10px">
-        <thead>
-            <tr>
-                <th>Recipe ID</th>
-                <th>Recipe Title</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div id="findAllRecipeResultMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <!-- DELETE: show ingredients with delete buttons -->
-    <h2>Query 8: Delete Ingredient</h2>
-    <p>Click “delete” to remove an ingredient.</p>
-
-    <table id="ingredientTable" border="1" style="margin-top:10px">
-        <thead>
-            <tr>
-                <th>Ingredient ID</th>
-                <th>Ingredient Name</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <div id="deleteIngredientMsg"></div>
-
     <br><hr><br> <!-- ========================================================================= -->
 
     <!-- JOIN: customers who rated a given recipe with >= minStars -->
-    <h2>Query 9: Customers By Recipe and Rating (JOIN)</h2>
+    <h2>Query 6: Customers By Recipe and Rating (JOIN)</h2>
 
     <form id="customersByRecipeForm">
         Recipe Title: <input type="text" id="recipeTitleInput" placeholder="Enter recipe title" required> <br><br>
@@ -284,6 +235,25 @@
     </table>
 
     <div id="customersByRecipeMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <h2>Query 7: Count recipes in savedlists</h2>
+
+    <button type="submit" id="savedListCountBtn">Show Recipe Counts per Saved List</button>
+
+    <table id="savedListCountTable" border="1" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th>SavedList Name</th>
+                <th>Owner Name</th>
+                <th>Recipe Count</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="savedListCountResultMsg"></div>
 
     <br><hr><br> <!-- ========================================================================= -->
 
@@ -312,7 +282,7 @@
 
     <br><hr><br> <!-- ===================================================================================== -->
     <!-- Nested Aggregation: cuisines with highest average rating -->
-    <h2>Query 11: Top Cuisines by Average Rating (Nested Aggregation)</h2>
+    <h2>Query 9: Top Cuisines by Average Rating (Nested Aggregation)</h2>
 
     <button id="loadTopCuisines">show top cuisines</button>
 
@@ -327,6 +297,32 @@
     </table>
 
     <div id="topCuisinesMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <h2>Query 10: Find recipe with all ingredients</h2>
+
+    <form id="findAllRecipes">
+        ingredient1: <input type="text" id="ingone" placeholder="Enter first ingredient" maxlength="50"> <br><br>
+        ingredient2: <input type="text" id="ingtwo" placeholder="Enter second ingredient" maxlength="50"> <br><br>
+        ingredient3: <input type="text" id="ingthree" placeholder="Enter third ingredient" maxlength="50"> <br><br>
+        ingredient4: <input type="text" id="ingfour" placeholder="Enter fourth ingredient" maxlength="50"> <br><br>
+        ingredient5: <input type="text" id="ingfive" placeholder="Enter fifth ingredient" maxlength="50"> <br><br>
+
+        <button type="submit"> find recipes </button> <br>
+    </form>
+
+    <table id="findAllRecipesTable" border="1" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th>Recipe ID</th>
+                <th>Recipe Title</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="findAllRecipeResultMsg"></div>
 
     <!-- ===================================================================================== -->
 
