@@ -157,6 +157,26 @@ async function selectCustomerType(event) {
     }
 }
 
+// Fetch and display ingredient table
+async function fetchAllIngredients() {
+    const table = document.getElementById("allIngredients");
+    const body = table.querySelector("tbody");
+
+    const res = await fetch("/ingredients", { method: "GET" });
+    const data = await res.json();
+
+    const rows = data.data;
+
+    body.innerHTML = "";
+
+    rows.forEach(row => {
+        const tr = body.insertRow();
+        tr.insertCell(0).textContent = row.ID;
+        tr.insertCell(1).textContent = row.NAME;
+    });
+}
+
+
 // Fetch and display customer type and information
 async function fetchAndDisplayCustomerType() {
     const tableElement1 = document.getElementById('customer');
@@ -250,17 +270,70 @@ async function updateCustomer() {
     }
 }
 
+// PROJECTION (Query 5)
+async function runRecipeProjection() {
+    const selected = [...document.querySelectorAll('.projAttr:checked')]
+        .map(cb => cb.value);
+
+    const msg = document.getElementById("projectionMsg");
+
+    if (selected.length === 0) {
+        msg.textContent = "Select at least one attribute.";
+        return;
+    }
+
+    const res = await fetch("/recipes/projection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ attributes: selected })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+        msg.textContent = "Projection failed.";
+        return;
+    }
+
+    msg.textContent = "Projection successful.";
+
+    // Render headers
+    const headerRow = document.getElementById("projectionHeader");
+    const body = document.getElementById("projectionBody");
+
+    headerRow.innerHTML = "";
+    body.innerHTML = "";
+
+    selected.forEach(attr => {
+        const th = document.createElement("th");
+        th.textContent = attr;
+        headerRow.appendChild(th);
+    });
+
+    data.data.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(value => {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+        });
+        body.appendChild(tr);
+    });
+}
+
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
 window.onload = function() {
     checkDbConnection();
     fetchTableData();
+    fetchAllIngredients();
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
     document.getElementById("updateCustomerBtn").addEventListener("click", updateCustomer);
+    document.getElementById("projectionBtn").addEventListener("click", projectIngredients);
 };
 
 // General function to refresh the displayed table data. 

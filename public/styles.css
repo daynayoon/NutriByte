@@ -98,3 +98,43 @@ input::placeholder, textarea::placeholder {
     height: 1em;
     vertical-align: middle;
 }
+
+/* PROJECTION CHECK BOX */
+.attribute-container {
+    display: flex;
+    gap: 30px; 
+    flex-wrap: wrap; 
+    justify-content: center;
+    
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.projection-row {
+    display: flex;
+    gap: 5px; 
+    margin-bottom: 0px; 
+    align-items: center;
+    background: none; 
+}
+
+.projection-row span {
+    text-align: left;
+    width: auto; 
+    display: inline-block; 
+    white-space: nowrap;
+}
+
+.projAttr {
+    width: auto;
+    height: auto;
+    padding: 0;
+    margin: 0;
+    border: none; 
+    background: none;
+    min-width: 15px; 
+    min-height: 15px;
+    box-sizing: content-box; 
+    -webkit-appearance: checkbox;
+    appearance: checkbox;
+}

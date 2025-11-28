@@ -151,6 +151,53 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
+    <h2>Query 5: Projection on Recipe</h2>
+
+    <p>Select attributes to display:</p>
+
+    <div class="attribute-container">
+        <div class="projection-row">
+            <span>ID</span>
+            <input type="checkbox" class="projAttr" value="ID">
+        </div>
+
+        <div class="projection-row">
+            <span>Title</span>
+            <input type="checkbox" class="projAttr" value="title">
+        </div>
+
+        <div class="projection-row">
+            <span>Time Consumed</span>
+            <input type="checkbox" class="projAttr" value="time_consumed">
+        </div>
+
+        <div class="projection-row">
+            <span>Difficulty</span>
+            <input type="checkbox" class="projAttr" value="difficulty">
+        </div>
+
+        <div class="projection-row">
+            <span>Cuisine ID</span>
+            <input type="checkbox" class="projAttr" value="cuisineID">
+        </div>
+    </div>
+    
+    <button onclick="runRecipeProjection()">Run Projection</button>
+
+    <div id="projectionMsg"></div>
+
+    <br>
+
+    <table id="projectionRecipeTable" border="1">
+        <thead><tr id="projectionHeader"></tr></thead>
+        <tbody id="projectionBody"></tbody>
+    </table>
+
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+
+
     <h2>Query 7: Count recipes in savedlists</h2>
 
     <button type="submit" id="savedListCountBtn">Show Recipe Counts per Saved List</button>
