@@ -16,6 +16,8 @@ const dbConfig = {
     poolTimeout: 60
 };
 
+// console.log("DB CONNECTING TO:", dbConfig);
+
 // initialize connection pool
 async function initializeConnectionPool() {
     try {
@@ -364,6 +366,76 @@ async function getTopCuisinesByAvgRating() {
     });
 }
 
+// UPDATE, PROJECTION, AGGREGATION WITH HAVING Query Implementation
+// UPDATE: PK: ID
+async function updateCustomer(id, newName, newEmail) {
+    return await withOracleDB(async (connection) => {
+        const SQL = `
+            UPDATE Customer
+            SET name = :newName,
+                email_address = :newEmail
+            WHERE ID = :id
+        `;
+
+        const binds = {
+            newName,
+            newEmail,
+            id
+        };
+
+        const result = await connection.execute(SQL, binds, { autoCommit: true });
+        return result.rowsAffected && result.rowsAffected > 0;
+    }).catch((err) => {
+        console.error("Error updating customer:", err);
+        return false;
+    });
+}
+
+
+// PROJECTION 
+async function projectRecipe(attributes) {
+    return await withOracleDB(async (connection) => {
+        const columns = attributes.join(", ");
+        const sql = `SELECT ${columns} FROM Recipe`;
+
+        const result = await connection.execute(sql, [], {
+            outFormat: oracledb.OUT_FORMAT_ARRAY
+        });
+
+        return result.rows;
+    }).catch((err) => {
+        console.error("Projection error:", err);
+        return null;
+    });
+}
+
+// AGGREGATION with HAVING: recipe title which has average rating >= threshold
+async function getRecipesAboveAvgRating(threshold) {
+    return await withOracleDB(async (connection) => {
+        const SQL = `
+            SELECT R.title, AVG(RT.stars) AS avg_rating
+            FROM Recipe R
+            JOIN Rate RT ON R.ID = RT.RecipeID
+            GROUP BY R.ID, R.title
+            HAVING AVG(RT.stars) >= :threshold
+            ORDER BY avg_rating DESC
+        `;
+
+        const result = await connection.execute(
+            SQL,
+            { threshold },
+            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+        );
+
+        return result.rows;
+    }).catch((err) => {
+        console.error("Error in getRecipesAboveAvgRating:", err);
+        return [];
+    });
+}
+
+
+
 module.exports = {
     testOracleConnection,
     fetchRecipeFromDb,
@@ -377,4 +449,7 @@ module.exports = {
     deleteIngredient,
     getCustomersByRecipeAndRating,
     getTopCuisinesByAvgRating,
+    updateCustomer,
+    projectRecipe,
+    getRecipesAboveAvgRating,
 };
