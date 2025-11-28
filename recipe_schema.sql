@@ -25,16 +25,6 @@ CREATE TABLE Customer (
   PRIMARY KEY (ID)
 );
 
-CREATE TABLE SavedLists (
-  ID INTEGER,
-  name CHAR(50),
-  ownerID INTEGER NOT NULL,
-  recipeID INTEGER NOT NULL,
-  UNIQUE (ownerID, name, recipeID),
-  PRIMARY KEY (ID),
-  FOREIGN KEY (ownerID) REFERENCES Customer(ID)
-);
-
 CREATE TABLE Cuisine (
   ID INTEGER,
   style CHAR(50),
@@ -50,6 +40,17 @@ CREATE TABLE Recipe (
   UNIQUE (title),
   PRIMARY KEY (ID),
   FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
+);
+
+CREATE TABLE SavedLists (
+  ID INTEGER,
+  name CHAR(50),
+  ownerID INTEGER NOT NULL,
+  recipeID INTEGER NOT NULL,
+  UNIQUE (ownerID, name, recipeID),
+  PRIMARY KEY (ID),
+  FOREIGN KEY (ownerID) REFERENCES Customer(ID),
+  FOREIGN KEY (recipeID) REFERENCES Recipe(ID)
 );
 
 CREATE TABLE Instruction (
@@ -194,14 +195,6 @@ INSERT INTO FoodCritic VALUES (4, 'Cares about presentation');
 INSERT INTO FoodCritic VALUES (5, 'Values ingredient quality');
 INSERT INTO FoodCritic VALUES (100, 'food criticizing professional');
 
-INSERT INTO SavedLists VALUES (1, 'Favorites', 1, 1);
-INSERT INTO SavedLists VALUES (2, 'To Try', 2, 2);
-INSERT INTO SavedLists VALUES (12, 'Favorites', 2, 5);
-INSERT INTO SavedLists VALUES (3, 'High Protein', 3, 3);
-INSERT INTO SavedLists VALUES (13, 'High Protein', 3, 6);
-INSERT INTO SavedLists VALUES (4, 'Spicy Food', 4, 1);
-INSERT INTO SavedLists VALUES (5, 'Comfort Meals', 5, 2);
-
 INSERT INTO Cuisine VALUES (1, 'Japanese');
 INSERT INTO Cuisine VALUES (2, 'Italian');
 INSERT INTO Cuisine VALUES (3, 'Korean');
@@ -213,6 +206,14 @@ INSERT INTO Recipe VALUES (2, 'Tteokbokki', 20, 'Easy', 3);
 INSERT INTO Recipe VALUES (3, 'Sushi', 45, 'Hard', 1);
 INSERT INTO Recipe VALUES (4, 'Fried Rice', 15, 'Easy', 4);
 INSERT INTO Recipe VALUES (5, 'Burger', 30, 'Medium', 5);
+
+INSERT INTO SavedLists VALUES (1, 'Favorites', 1, 1);
+INSERT INTO SavedLists VALUES (2, 'To Try', 2, 2);
+INSERT INTO SavedLists VALUES (12, 'Favorites', 2, 5);
+INSERT INTO SavedLists VALUES (3, 'High Protein', 3, 3);
+INSERT INTO SavedLists VALUES (13, 'High Protein', 3, 4);
+INSERT INTO SavedLists VALUES (4, 'Spicy Food', 4, 1);
+INSERT INTO SavedLists VALUES (5, 'Comfort Meals', 5, 2);
 
 INSERT INTO Instruction VALUES (1, 1, 'Boil pasta until al dente.');
 INSERT INTO Instruction VALUES (2, 1, 'Mix egg and cheese in bowl.');
