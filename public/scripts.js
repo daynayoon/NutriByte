@@ -555,7 +555,6 @@ window.onload = function() {
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
     document.getElementById("updateCustomerBtn").addEventListener("click", updateCustomer);
-    // document.getElementById("projectionBtn").addEventListener("click", projectIngredients);
     document.getElementById("findAllRecipes").addEventListener("submit", findAllRecipes);
     document.getElementById("customersByRecipeForm").addEventListener("submit", customersByRecipe);
     document.getElementById("loadTopCuisines").addEventListener("click", loadTopCuisines);
