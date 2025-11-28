@@ -114,16 +114,21 @@ router.put('/customer/:id', async (req, res) => {
     }
 });
 
-// PROJECTION: Return only selected Ingredient attributes
-router.post('/ingredients/projection', async (req, res) => {
+// PROJECTION: Return only selected Recipe attributes
+router.post('/recipes/projection', async (req, res) => {
     const { attributes } = req.body;
 
     if (!attributes || attributes.length === 0) {
-        return res.status(400).json({ success: false, message: "No attributes selected." });
+        return res.status(400).json({ success: false, message: "No attributes provided." });
     }
 
-    const rows = await appService.projectIngredients(attributes);
-    res.json({ data: rows });
+    const rows = await appService.projectRecipe(attributes);
+
+    if (!rows) {
+        return res.status(400).json({ success: false });
+    }
+
+    res.json({ success: true, data: rows });
 });
 
 // HAVING: recipe that ave rating >= threshold

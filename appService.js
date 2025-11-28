@@ -319,18 +319,20 @@ async function updateCustomer(id, newName, newEmail) {
 }
 
 
-// PROJECTION (Ingredient attributes) seelct ID, name or name
-async function projectIngredients(attributes) {
+// PROJECTION 
+async function projectRecipe(attributes) {
     return await withOracleDB(async (connection) => {
         const columns = attributes.join(", ");
+        const sql = `SELECT ${columns} FROM Recipe`;
 
-        const SQL = `SELECT ${columns} FROM Ingredient`;
+        const result = await connection.execute(sql, [], {
+            outFormat: oracledb.OUT_FORMAT_ARRAY
+        });
 
-        const result = await connection.execute(SQL, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
         return result.rows;
     }).catch((err) => {
-        console.error("Error projecting ingredients:", err);
-        return [];
+        console.error("Projection error:", err);
+        return null;
     });
 }
 
@@ -374,6 +376,6 @@ module.exports = {
     getCustomersByRecipeAndRating,
     getTopCuisinesByAvgRating,
     updateCustomer,
-    projectIngredients,
+    projectRecipe,
     getRecipesAboveAvgRating,
 };
