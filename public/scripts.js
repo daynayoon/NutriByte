@@ -267,17 +267,139 @@ async function findAllRecipes(event) {
     }
 }
 
+
+/* DELETE: ingredient table + delete button */
+async function fetchAndDisplayIngredients() {
+    const tableElement = document.getElementById('ingredientTable');
+    if (!tableElement) return;
+    const tableBody = tableElement.querySelector('tbody');
+
+    const response = await fetch('/ingredients', { method: 'GET' });
+    const responseData = await response.json();
+    const data = responseData.data; // objects with ID, NAME
+
+    if (tableBody) {
+        tableBody.innerHTML = '';
+    }
+
+    data.forEach(row => {
+        const tr = tableBody.insertRow();
+
+        const idCell = tr.insertCell();
+        idCell.textContent = row.ID;
+
+        const nameCell = tr.insertCell();
+        nameCell.textContent = row.NAME;
+
+        const actionCell = tr.insertCell();
+        const btn = document.createElement('button');
+        btn.textContent = 'delete';
+        btn.onclick = () => deleteIngredient(row.ID);
+        actionCell.appendChild(btn);
+    });
+}
+
+async function deleteIngredient(id) {
+    const msg = document.getElementById('deleteIngredientMsg');
+
+    const response = await fetch(`/ingredient/${id}`, {
+        method: 'DELETE'
+    });
+
+    const data = await response.json();
+    if (response.ok && data.success) {
+        msg.textContent = `Ingredient ${id} deleted successfully.`;
+        fetchAndDisplayIngredients();
+    } else {
+        msg.textContent = data.message || 'Failed to delete ingredient.';
+    }
+}
+
+/* JOIN: customers by recipe and min rating */
+
+async function customersByRecipe(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('recipeTitleInput').value;
+    const minStars = document.getElementById('minStarsInput').value;
+
+    const response = await fetch('/customers-by-recipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ recipeTitle: title, minStars: Number(minStars) })
+    });
+
+    const data = await response.json();
+    const msg = document.getElementById('customersByRecipeMsg');
+    const table = document.getElementById('customersByRecipeTable');
+    const tbody = table.querySelector('tbody');
+
+    if (!response.ok) {
+        msg.textContent = data.message || 'Error running query.';
+        table.style.display = 'none';
+        return;
+    }
+
+    msg.textContent = '';
+    if (tbody) tbody.innerHTML = '';
+
+    data.data.forEach(row => {
+        const tr = tbody.insertRow();
+        const values = [row.ID, row.NAME, row.EMAIL_ADDRESS, row.STARS];
+        values.forEach(v => {
+            const cell = tr.insertCell();
+            cell.textContent = v;
+        });
+    });
+
+    table.style.display = 'table';
+}
+
+/* Nested Aggregation: top cuisines */
+
+async function loadTopCuisines() {
+    const response = await fetch('/top-cuisines', { method: 'GET' });
+    const data = await response.json();
+
+    const msg = document.getElementById('topCuisinesMsg');
+    const table = document.getElementById('topCuisinesTable');
+    const tbody = table.querySelector('tbody');
+
+    if (!response.ok) {
+        msg.textContent = data.message || 'Error loading cuisines.';
+        table.style.display = 'none';
+        return;
+    }
+
+    msg.textContent = '';
+    if (tbody) tbody.innerHTML = '';
+
+    data.data.forEach(row => {
+        const tr = tbody.insertRow();
+        const styleCell = tr.insertCell();
+        const avgCell = tr.insertCell();
+
+        styleCell.textContent = row.STYLE;
+        avgCell.textContent = row.AVGCUISINERATING;
+    });
+
+    table.style.display = 'table';
+}
+
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
 window.onload = function() {
     checkDbConnection();
     fetchTableData();
+    fetchAndDisplayIngredients();
     document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
     document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
     document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
     document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
     document.getElementById("findAllRecipes").addEventListener("submit", findAllRecipes);
+    document.getElementById("customersByRecipeForm").addEventListener("submit", customersByRecipe);
+    document.getElementById("loadTopCuisines").addEventListener("click", loadTopCuisines);
 };
 
 // General function to refresh the displayed table data. 
