@@ -181,7 +181,7 @@
             <input type="checkbox" class="projAttr" value="cuisineID">
         </div>
     </div>
-    
+
     <button onclick="runRecipeProjection()">Run Projection</button>
 
     <div id="projectionMsg"></div>
@@ -215,7 +215,30 @@
 
     <br><hr><br> <!-- ========================================================================= -->
 
-    <!-- ===================================================================================== -->
+    <h2>Query 8: Aggregation with HAVING</h2>
+    <h3>(Recipes with Avg Rating ≥ Threshold)</h3>
+
+    <p>Enter rating threshold:</p>
+    <input type="number" step="0.1" id="havingThreshold" placeholder="e.g., 4.0">
+
+    <br><br>
+    <button onclick="runHavingQuery()">Run HAVING Query</button>
+
+    <div id="havingMsg"></div>
+
+    <br>
+
+    <table id="havingTable" border="1">
+        <thead>
+            <tr id="havingHeader">
+                <th>Recipe Title</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody id="havingBody"></tbody>
+    </table>
+
+    <br><hr><br> <!-- ===================================================================================== -->
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
     <script src="scripts.js"></script>
 </body>
