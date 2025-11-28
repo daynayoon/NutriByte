@@ -57,9 +57,10 @@
 
     <h2> Query 1: Insert Values into Recipe </h2>
     <form id="insertRecipe">
-        ID: <input type="number" id="insertId" placeholder="Enter ID" required> <br><br>
+        Customer ID: <input type="number" id="insertCustomerID" placeholder="Enter your ID" required> <br><br>
+        Recipe ID: <input type="number" id="insertId" placeholder="Enter Recipe ID" required> <br><br>
         Title: <input type="text" id="insertTitle" placeholder="Enter Title" maxlength="100"> <br><br>
-        time_consumed: <input type="char" id="insertTimeConsumed" placeholder="Enter Time Consumed" maxlength="20"> <br><br>
+        time_consumed: <input type="number" id="insertTimeConsumed" placeholder="Enter Time Consumed (number in minutes)" maxlength="20"> <br><br>
         difficulty: <input type="number" id="insertDifficulty" placeholder="Enter Difficulty Level (1 easy ~ 5 difficult)" min="1", max="5"> <br><br>
         cuisineID: <input type="number" id="insertCuisineID" placeholder="Enter Cuisine ID" maxlength="20"> <br><br>
 
@@ -213,6 +214,77 @@
         <tbody></tbody>
     </table>
 
+    <div id="savedListCountResultMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <h2>Query 10: Find recipe with all ingredients</h2>
+
+    <form id="findAllRecipes">
+        ingredient1: <input type="text" id="ingone" placeholder="Enter first ingredient" maxlength="50"> <br><br>
+        ingredient2: <input type="text" id="ingtwo" placeholder="Enter second ingredient" maxlength="50"> <br><br>
+        ingredient3: <input type="text" id="ingthree" placeholder="Enter third ingredient" maxlength="50"> <br><br>
+        ingredient4: <input type="text" id="ingfour" placeholder="Enter fourth ingredient" maxlength="50"> <br><br>
+        ingredient5: <input type="text" id="ingfive" placeholder="Enter fifth ingredient" maxlength="50"> <br><br>
+
+        <button type="submit"> find recipes </button> <br>
+    </form>
+
+    <table id="findAllRecipesTable" border="1" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th>Recipe ID</th>
+                <th>Recipe Title</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="findAllRecipeResultMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <!-- DELETE: show ingredients with delete buttons -->
+    <h2>Query 8: Delete Ingredient</h2>
+    <p>Click “delete” to remove an ingredient.</p>
+
+    <table id="ingredientTable" border="1" style="margin-top:10px">
+        <thead>
+            <tr>
+                <th>Ingredient ID</th>
+                <th>Ingredient Name</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div id="deleteIngredientMsg"></div>
+
+    <br><hr><br> <!-- ========================================================================= -->
+
+    <!-- JOIN: customers who rated a given recipe with >= minStars -->
+    <h2>Query 9: Customers By Recipe and Rating (JOIN)</h2>
+
+    <form id="customersByRecipeForm">
+        Recipe Title: <input type="text" id="recipeTitleInput" placeholder="Enter recipe title" required> <br><br>
+        Minimum Stars: <input type="number" id="minStarsInput" placeholder="1–5" min="1" max="5" required> <br><br>
+        <button type="submit"> search </button>
+    </form>
+
+    <table id="customersByRecipeTable" border="1" style="margin-top:10px; display:none;">
+        <thead>
+            <tr>
+                <th>Customer ID</th>
+                <th>Name</th>
+                <th>email_address</th>
+                <th>stars</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="customersByRecipeMsg"></div>
+
     <br><hr><br> <!-- ========================================================================= -->
 
     <h2>Query 8: Aggregation with HAVING</h2>
@@ -239,6 +311,25 @@
     </table>
 
     <br><hr><br> <!-- ===================================================================================== -->
+    <!-- Nested Aggregation: cuisines with highest average rating -->
+    <h2>Query 11: Top Cuisines by Average Rating (Nested Aggregation)</h2>
+
+    <button id="loadTopCuisines">show top cuisines</button>
+
+    <table id="topCuisinesTable" border="1" style="margin-top:10px; display:none;">
+        <thead>
+            <tr>
+                <th>Cuisine Style</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="topCuisinesMsg"></div>
+
+    <!-- ===================================================================================== -->
+
     <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
     <script src="scripts.js"></script>
 </body>
