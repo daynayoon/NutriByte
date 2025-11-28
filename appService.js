@@ -16,6 +16,8 @@ const dbConfig = {
     poolTimeout: 60
 };
 
+// console.log("DB CONNECTING TO:", dbConfig);
+
 // initialize connection pool
 async function initializeConnectionPool() {
     try {
@@ -373,5 +375,5 @@ module.exports = {
     getTopCuisinesByAvgRating,
     updateCustomer,
     projectIngredients,
-    getRecipesByMinAvgRating,
+    getRecipesAboveAvgRating,
 };
