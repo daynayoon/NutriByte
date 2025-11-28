@@ -321,6 +321,47 @@ async function runRecipeProjection() {
     });
 }
 
+// AGGREGATION WITH HAVING (Query 8)
+async function runHavingQuery() {
+    const thresholdInput = document.getElementById("havingThreshold");
+    const msg = document.getElementById("havingMsg");
+    const body = document.getElementById("havingBody");
+
+    const threshold = thresholdInput.value;
+
+    if (threshold === "") {
+        msg.textContent = "Enter a threshold.";
+        return;
+    }
+
+    const res = await fetch("/recipes/avg-rating", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ threshold })
+    });
+
+    const data = await res.json();
+
+    if (!data.data) {
+        msg.textContent = "Query failed.";
+        return;
+    }
+
+    msg.textContent = "Query executed successfully.";
+
+    body.innerHTML = "";
+
+    data.data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${row.TITLE || row[0]}</td>
+            <td>${row.AVG_RATING || row[1]}</td>
+        `;
+        body.appendChild(tr);
+    });
+}
+
+
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
 // Add or remove event listeners based on the desired functionalities.
