@@ -179,21 +179,16 @@ HAVING AVG(R.stars) >= ALL (
 ```
 
 ## DIVISION
-query: Find recipes that contain all ingredients selected by the user.
+query: Find all recipes that contain all ingredients selected by the user.
+when no ingredients are selected, it shows all recipes. 
 
 sql:
 ```sql
 SELECT R.ID, R.title
 FROM Recipe R
-WHERE NOT EXISTS (
-    SELECT I.ID
-    FROM Ingredient I
-    WHERE I.ID IN (:ing1, :ing2, :ing3, ...)
-    AND NOT EXISTS (
-        SELECT 1
-        FROM Contain C
-        WHERE C.RecipeID = R.ID
-        AND C.IngredientID = I.ID
-    )
-);
+JOIN Contain C ON R.ID = C.RecipeID
+JOIN Ingredient I ON C.IngredientID = I.ID
+WHERE LOWER(TRIM(I.name)) IN (:ing0, :ing1, :ing2, ing3, ing4)
+GROUP BY R.ID, R.title
+HAVING COUNT(DISTINCT LOWER(TRIM(I.name))) = :ingCount
 ```
