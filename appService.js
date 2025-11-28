@@ -82,7 +82,7 @@ async function testOracleConnection() {
 
 async function fetchRecipeFromDb() {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT * FROM Recipe');
+        const result = await connection.execute('SELECT * FROM Recipe ORDER BY ID ASC');
         return result.rows;
     }).catch(() => {
         return [];
