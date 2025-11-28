@@ -322,13 +322,16 @@ async function getCustomersByRecipeAndRating(recipeTitle, minStars) {
             `
             SELECT C.ID, C.name, C.email_address, R.stars
             FROM Customer C
-            JOIN Rate R ON C.ID = R.CustomerID
+            JOIN Rate   R  ON C.ID = R.CustomerID
             JOIN Recipe Re ON R.RecipeID = Re.ID
-            WHERE Re.title = :recipeTitle
+            WHERE LOWER(TRIM(Re.title)) LIKE '%' || LOWER(TRIM(:recipeTitle)) || '%'
               AND R.stars >= :minStars
             ORDER BY C.ID
             `,
-            { recipeTitle, minStars },
+            {
+                recipeTitle,
+                minStars: Number(minStars)
+            },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
         return result.rows;
@@ -337,6 +340,7 @@ async function getCustomersByRecipeAndRating(recipeTitle, minStars) {
         return [];
     });
 }
+
 
 async function getTopCuisinesByAvgRating() {
     return await withOracleDB(async (connection) => {
