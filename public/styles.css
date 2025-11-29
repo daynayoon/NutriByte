@@ -89,6 +89,18 @@ input, textarea {
     margin-bottom: 10px;
 }
 
+select {
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #00065e;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
 input::placeholder, textarea::placeholder {
     color: #aaa;
 }
