@@ -319,15 +319,23 @@ async function fetchIngredients() {
 
 async function deleteIngredient(id) {
     return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `DELETE FROM Ingredient WHERE ID = :id`,
-            [id],
-            { autoCommit: true }
-        );
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch((err) => {
-        console.error("Error deleting ingredient:", err);
-        return false;
+        try {
+            const result = await connection.execute(
+                `DELETE FROM Ingredient WHERE ID = :id`,
+                [id],
+                { autoCommit: true }
+            );
+            if (!result.rowsAffected || result.rowsAffected === 0) {
+                return { ok: false, reason: 'NOT_FOUND' };
+            }
+            return { ok: true };
+        } catch (err) {
+            console.error("Error deleting ingredient:", err);
+            if (err.errorNum === 2292) {
+                return { ok: false, reason: 'HAS_DEPENDENCIES' };
+            }
+            return { ok: false, reason: 'DB_ERROR' };
+        }
     });
 }
 
@@ -389,24 +397,30 @@ async function getTopCuisinesByAvgRating() {
 // UPDATE: PK: ID
 async function updateCustomer(id, newName, newEmail) {
     return await withOracleDB(async (connection) => {
-        const SQL = `
+        const existing = await connection.execute(
+            `SELECT ID FROM Customer WHERE ID = :id`,
+            { id }
+        );
+        if (existing.rows.length === 0) { return { ok: false, reason: 'NOT_FOUND' };}
+        const result = await connection.execute(
+            `
             UPDATE Customer
-            SET name = :newName,
-                email_address = :newEmail
+            SET 
+                name = COALESCE(:newName, name),
+                email_address = COALESCE(:newEmail, email_address)
             WHERE ID = :id
-        `;
-
-        const binds = {
-            newName,
-            newEmail,
-            id
-        };
-
-        const result = await connection.execute(SQL, binds, { autoCommit: true });
-        return result.rowsAffected && result.rowsAffected > 0;
-    }).catch((err) => {
+            `,
+            {
+                newName: newName || null,
+                newEmail: newEmail || null,
+                id
+            },
+            { autoCommit: true }
+        );
+        return { ok: true };
+    }).catch(err => {
         console.error("Error updating customer:", err);
-        return false;
+        return { ok: false, reason: 'DB_ERROR' };
     });
 }
 

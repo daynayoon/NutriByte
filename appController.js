@@ -86,12 +86,24 @@ router.get('/ingredients', async (req, res) => {
 
 router.delete('/ingredient/:id', async (req, res) => {
     const id = req.params.id;
-    const success = await appService.deleteIngredient(id);
-    if (success) {
-        res.json({ success: true, message: 'Ingredient deleted successfully.' });
-    } else {
-        res.status(400).json({ success: false, message: 'Failed to delete ingredient.' });
+    const result = await appService.deleteIngredient(id);
+    if (result.ok) {
+        return res.json({ success: true, message: 'Ingredient deleted successfully.' });
     }
+    let message;
+    switch (result.reason) {
+        case 'NOT_FOUND':
+            message = 'Ingredient not found.';
+            break;
+        case 'HAS_DEPENDENCIES':
+            message = 'Cannot delete: this ingredient is referenced by other tables.';
+            break;
+        case 'DB_ERROR':
+        default:
+            message = 'Failed to delete ingredient due to a server error.';
+            break;
+    }
+    return res.status(400).json({ success: false, message });
 });
 
 router.post('/customers-by-recipe', async (req, res) => {
@@ -114,18 +126,26 @@ router.get('/top-cuisines', async (req, res) => {
 router.put('/customer/:id', async (req, res) => {
     const customerID = req.params.id;
     const { newName, newEmail } = req.body;
-
     if (!newName && !newEmail) {
-        return res.status(400).json({ success: false, message: "Nothing to update." });
+        return res.status(400).json({
+            success: false,
+            message: "Enter at least one of name or email to update."
+        });
     }
-
-    const success = await appService.updateCustomer(customerID, newName, newEmail);
-
-    if (success) {
-        res.json({ success: true, message: "Customer updated successfully." });
-    } else {
-        res.status(400).json({ success: false, message: "Failed to update customer." });
+    const result = await appService.updateCustomer(customerID, newName, newEmail);
+    if (result.ok) {
+        return res.json({ success: true, message: "Customer updated successfully." });
     }
+    if (result.reason === 'NOT_FOUND') {
+        return res.status(400).json({
+            success: false,
+            message: "Customer ID does not exist."
+        });
+    }
+    return res.status(500).json({
+        success: false,
+        message: "Database error occurred."
+    });
 });
 
 // PROJECTION: Return only selected Recipe attributes
