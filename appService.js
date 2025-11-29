@@ -456,7 +456,7 @@ async function getRecipesAboveAvgRating(threshold) {
 
         const result = await connection.execute(
             SQL,
-            { threshold },
+            { threshold: Number(threshold) },
             { outFormat: oracledb.OUT_FORMAT_OBJECT }
         );
 

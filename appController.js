@@ -173,9 +173,23 @@ router.post('/recipes/avg-rating', async (req, res) => {
         return res.status(400).json({ success: false, message: "threshold is required." });
     }
 
-    const rows = await appService.getRecipesAboveAvgRating(threshold);
-    res.json({ data: rows });
+    const num = Number(threshold);
+
+    if (Number.isNaN(num)) {
+        return res.status(400).json({ success: false, message: "threshold must be a number." });
+    }
+
+    if (num > 5) {
+        return res.status(400).json({
+            success: false,
+            message: "threshold cannot be greater than 5. Rating is between 1 and 5."
+        });
+    }
+
+    const rows = await appService.getRecipesAboveAvgRating(num);
+    res.json({ success: true, data: rows });
 });
+
 
 
 
