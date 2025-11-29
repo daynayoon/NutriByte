@@ -319,28 +319,6 @@ INSERT INTO Rate VALUES (100, 5, 5);
 INSERT INTO Rate VALUES (200, 5, 5);
 INSERT INTO Rate VALUES (300, 5, 4);
 
-INSERT INTO Recipe VALUES (1, 'Pasta Carbonara', 25, 'Medium', 2);
-INSERT INTO Recipe VALUES (2, 'Tteokbokki', 20, 'Easy', 3);
-INSERT INTO Recipe VALUES (3, 'Sushi', 45, 'Hard', 1);
-INSERT INTO Recipe VALUES (4, 'Fried Rice', 15, 'Easy', 4);
-INSERT INTO Recipe VALUES (5, 'Burger', 30, 'Medium', 5);
-INSERT INTO Recipe VALUES (6, 'Pasta Bolognese', 25, 'Medium', 2);
-INSERT INTO Recipe VALUES (7, 'Fried Chicken', 40, 'Medium', 5);
-INSERT INTO Recipe VALUES (8, 'Pizza', 45, 'Hard', 2);
-INSERT INTO Recipe VALUES (9, 'Kimbap', 30, 'Medium', 3);
-INSERT INTO Recipe VALUES (10, 'Dimsum', 60, 'Hard', 4);
-
-INSERT INTO Ingredient VALUES (1, 'Egg');
-INSERT INTO Ingredient VALUES (2, 'Peanut');
-INSERT INTO Ingredient VALUES (3, 'Pasta Noodle');
-INSERT INTO Ingredient VALUES (4, 'Cheese');
-INSERT INTO Ingredient VALUES (5, 'Soy');
-INSERT INTO Ingredient VALUES (6, 'Tomato');
-INSERT INTO Ingredient VALUES (7, 'Lettuce');
-INSERT INTO Ingredient VALUES (8, 'Garlic');
-INSERT INTO Ingredient VALUES (9, 'Milk');
-INSERT INTO Ingredient VALUES (10, 'Chicken');
-
 INSERT INTO Contain VALUES (1, 3);
 INSERT INTO Contain VALUES (1, 1);
 INSERT INTO Contain VALUES (1, 4);
