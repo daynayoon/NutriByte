@@ -513,10 +513,24 @@ async function runHavingQuery() {
     const msg = document.getElementById("havingMsg");
     const body = document.getElementById("havingBody");
 
-    const threshold = thresholdInput.value;
+    const thresholdStr = thresholdInput.value;
+    msg.textContent = "";
+    body.innerHTML = "";
 
-    if (threshold === "") {
+    if (thresholdStr === "") {
         msg.textContent = "Enter a threshold.";
+        return;
+    }
+
+    const threshold = Number(thresholdStr);
+
+    if (Number.isNaN(threshold)) {
+        msg.textContent = "Threshold must be a number.";
+        return;
+    }
+
+    if (threshold > 5) {
+        msg.textContent = "Threshold cannot be greater than 5. Rating is between 1 and 5.";
         return;
     }
 
@@ -529,13 +543,11 @@ async function runHavingQuery() {
     const data = await res.json();
 
     if (!data.data) {
-        msg.textContent = "Query failed.";
+        msg.textContent = data.message || "Query failed.";
         return;
     }
 
     msg.textContent = "Query executed successfully.";
-
-    body.innerHTML = "";
 
     data.data.forEach(row => {
         const tr = document.createElement("tr");
