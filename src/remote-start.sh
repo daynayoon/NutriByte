@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Change to project root (parent of src/)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/.."
+
 # Set Oracle environment
 if [ -d /opt/oracle/instantclient_23_7 ]; then
     export ORACLE_HOME=/opt/oracle/instantclient_23_7
@@ -46,7 +50,7 @@ for PORT in $(seq $START $END); do
         # Kill the temporary process
         kill $TEMP_PID
 
-        # Replace the bash process with the Node process
+        # Replace the bash process with the Node process (run from project root)
         exec node src/server.js
         break
     fi

@@ -13,35 +13,32 @@ A culinary and nutrition management web application focused on recipe organizati
 | Frontend | Plain HTML, CSS, vanilla JavaScript (no frameworks) |
 | API | REST-like HTTP endpoints (GET, POST, PUT, DELETE) |
 | SQL | Raw SQL with schema file (`recipe_schema.sql`) |
-| Config | `.env` file with custom loader (`utils/envUtil.js`) |
+| Config | `.env` file with custom loader (`src/utils/envUtil.js`) |
 | Tooling | npm project with Windows/macOS scripts for Oracle Instant Client and SSH DB tunneling |
 
 ## Project Structure
 
 ```
 team_39/
-├── public/           # Static frontend assets
-│   ├── index.html    # Main application page
-│   ├── styles.css    # Styles
-│   └── scripts.js    # Client-side logic
-├── src/
-│   ├── server.js     # Express server entry point
-│   ├── appController.js  # API route handlers
-│   └── appService.js     # Database queries and business logic
-├── utils/
-│   └── envUtil.js    # Environment variable loader
-├── scripts/
-│   ├── win/          # Windows scripts
-│   │   ├── db-tunnel.cmd       # SSH tunnel for Oracle DB
-│   │   ├── server-tunnel.cmd   # Start server with tunnel
-│   │   └── instantclient-setup.cmd
-│   └── mac/          # macOS scripts
-│       ├── db-tunnel.sh
-│       ├── server-tunnel.sh
-│       └── instantclient-setup.sh
+├── .env              # Environment variables (create from template)
 ├── recipe_schema.sql # Database schema and seed data
 ├── QuerySpec.md      # Query specification reference
-└── package.json
+├── README.md
+└── src/
+    ├── package.json
+    ├── server.js     # Express server entry point
+    ├── appController.js
+    ├── appService.js
+    ├── remote-start.sh  # For UBC remote server
+    ├── public/       # Static frontend assets
+    │   ├── index.html
+    │   ├── styles.css
+    │   └── scripts.js
+    ├── utils/
+    │   └── envUtil.js
+    └── scripts/
+        ├── win/      # Windows: db-tunnel.cmd, server-tunnel.cmd, instantclient-setup.cmd
+        └── mac/      # macOS: db-tunnel.sh, server-tunnel.sh, instantclient-setup.sh
 ```
 
 ## Getting Started
@@ -49,12 +46,13 @@ team_39/
 ### Prerequisites
 
 - Node.js
-- Oracle Instant Client (see `scripts/win` or `scripts/mac` for setup)
+- Oracle Instant Client (see `src/scripts/win` or `src/scripts/mac` for setup)
 - UBC CWL account (for database access via SSH tunnel)
 
 ### 1. Install Dependencies
 
 ```bash
+cd src
 npm install
 ```
 
@@ -75,8 +73,8 @@ ORACLE_DBNAME=your_db_name
 
 For remote access to the UBC Oracle database, establish an SSH tunnel first:
 
-- **Windows**: Run `scripts/win/db-tunnel.cmd`
-- **macOS**: Run `scripts/mac/db-tunnel.sh`
+- **Windows**: Run `src/scripts/win/db-tunnel.cmd`
+- **macOS**: Run `src/scripts/mac/db-tunnel.sh`
 
 The script will prompt for your CWL and update `ORACLE_HOST` and `ORACLE_PORT` in `.env`.
 
@@ -86,11 +84,14 @@ Load the schema and seed data by running `recipe_schema.sql` against your Oracle
 
 ### 5. Start the Server
 
+From the `src/` directory:
+
 ```bash
+cd src
 npm start
 ```
 
-Or with the tunnel (Windows): `scripts/win/server-tunnel.cmd`
+Or run `src/remote-start.sh` from project root (for UBC remote server). With tunnel (Windows): `src/scripts/win/server-tunnel.cmd`
 
 The app will be available at `http://localhost:65534/` (or the port in your `.env`).
 
