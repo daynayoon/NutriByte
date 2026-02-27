@@ -1,7 +1,7 @@
 // Backend file that connects to the database. Includes queries. 
 
 const oracledb = require('oracledb');
-const loadEnvFile = require('./utils/envUtil');
+const loadEnvFile = require('../utils/envUtil');
 
 const envVariables = loadEnvFile('./.env');
 
