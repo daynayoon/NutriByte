@@ -4,7 +4,7 @@
 cd "$(dirname "$0")"
 
 # File path
-ENV_FILE_PATH="../../.env"
+ENV_FILE_PATH="../../../.env"
 
 # Define a range
 START=50000

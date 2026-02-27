@@ -5,7 +5,7 @@ setlocal enabledelayedexpansion
 cd %~dp0
 
 :: File path
-set ENV_FILE_PATH=..\..\.env
+set ENV_FILE_PATH=..\..\..\.env
 set TMP_FILE_PATH=temp.env
 
 :: Define a range

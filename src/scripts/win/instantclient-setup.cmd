@@ -17,7 +17,7 @@ echo :: Start Node application
 echo node src/server.js
 echo.
 echo exit /b 0
-) > ..\..\local-start.cmd
+) > ..\..\..\local-start.cmd
 
 echo --------------------------------------------------------------------------
 echo Setup complete. Run 'local-start.cmd' in your project folder to start your Node.js application.
