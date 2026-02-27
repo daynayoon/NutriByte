@@ -17,7 +17,7 @@ echo "# Configure the oracle instant client env variable"
 echo "export DYLD_LIBRARY_PATH=$oraclePath:\$DYLD_LIBRARY_PATH"
 echo
 echo "# Start Node application"
-echo "exec node server.js"
+echo "exec node src/server.js"
 ) > ../../local-start.sh
 
 # Change the permissions of the script to make it executable

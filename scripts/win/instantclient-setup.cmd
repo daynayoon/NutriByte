@@ -14,7 +14,7 @@ echo :: Configure the oracle instant client env variable
 echo set PATH=%%PATH%%;"%oraclePath%"
 echo.
 echo :: Start Node application
-echo node server.js
+echo node src/server.js
 echo.
 echo exit /b 0
 ) > ..\..\local-start.cmd
