@@ -27,3 +27,9 @@ previous_milestones/
 claude-code-toolkit.md
 CLAUDE.md
 .vercel
+
+# Playwright screenshots/logs
+.playwright-mcp/
+
+# DB dumps (may contain credentials)
+*_dump.sql
