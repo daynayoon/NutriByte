@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriByte — Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a href="index.html" class="nav-logo">NutriByte</a>
+    <div class="nav-right">
+      <div class="db-badge">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="dbStatus"></span>
+        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="">
+      </div>
+      <a href="index.html" class="back-link">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="page-hero hero-analytics">
+    <span class="hero-emoji">📊</span>
+    <h1>Analytics</h1>
+    <p>Dive into saved lists, ratings, and cuisine insights</p>
+  </div>
+
+  <div class="page-content">
+
+    <!-- Saved Lists Count -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">📋</span>
+        <h2 class="section-title">Saved Lists Recipe Count</h2>
+        <span class="op-tag">Q7 · GROUP BY</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Count how many recipes each saved list contains, grouped by owner.</p>
+        <button id="savedListCountBtn" class="btn btn-primary">📋 Load Counts</button>
+        <div id="savedListCountResultMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="savedListCountTable">
+            <thead>
+              <tr>
+                <th>Saved List Name</th>
+                <th>Owner</th>
+                <th>Recipe Count</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- HAVING -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">⭐</span>
+        <h2 class="section-title">Recipes by Average Rating</h2>
+        <span class="op-tag">Q8 · HAVING</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Show recipes whose average rating meets or exceeds a threshold (0–5).</p>
+        <div class="form-grid" style="max-width:320px">
+          <div class="field">
+            <label for="havingThreshold">Rating Threshold</label>
+            <input type="number" step="0.1" id="havingThreshold" placeholder="e.g. 4.0">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runHavingQuery()">▶ Run Query</button>
+        <div id="havingMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="havingTable">
+            <thead>
+              <tr id="havingHeader">
+                <th>Recipe Title</th>
+                <th>Average Rating</th>
+              </tr>
+            </thead>
+            <tbody id="havingBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Cuisines -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">🏆</span>
+        <h2 class="section-title">Top Cuisines by Rating</h2>
+        <span class="op-tag">Q9 · NESTED AGG</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Find cuisine styles with the highest average recipe ratings across all users.</p>
+        <button id="loadTopCuisines" class="btn btn-primary">🏆 Show Top Cuisines</button>
+        <div id="topCuisinesMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="topCuisinesTable" style="display:none">
+            <thead>
+              <tr>
+                <th>Cuisine Style</th>
+                <th>Average Rating</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const statusEl = document.getElementById('dbStatus');
+      const dot = document.getElementById('statusDot');
+      if (!statusEl || !dot) return;
+      new MutationObserver(function () {
+        const t = statusEl.textContent.trim();
+        dot.className = 'status-dot' + (t === 'connected' ? ' ok' : t ? ' err' : '');
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

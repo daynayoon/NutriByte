@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriByte — Customers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a href="index.html" class="nav-logo">NutriByte</a>
+    <div class="nav-right">
+      <div class="db-badge">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="dbStatus"></span>
+        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="">
+      </div>
+      <a href="index.html" class="back-link">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="page-hero hero-customers">
+    <span class="hero-emoji">👥</span>
+    <h1>Customers</h1>
+    <p>Update profiles, filter by role, and find by recipe rating</p>
+  </div>
+
+  <div class="page-content">
+
+    <!-- View & Update -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">✏️</span>
+        <h2 class="section-title">View &amp; Update Customers</h2>
+        <span class="op-tag">Q2 · UPDATE</span>
+      </div>
+      <div class="card">
+        <div class="table-wrap" style="margin-bottom:24px">
+          <table id="customerUpdateTable">
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Email Address</th>
+                <th>Cooking History</th><th>Rating History</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="section-desc">Enter a customer ID from the table above and update their name or email.</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="updateCustomerID">Customer ID</label>
+            <input type="number" id="updateCustomerID" placeholder="e.g. 1">
+          </div>
+          <div class="field">
+            <label for="updateCustomerName">New Name</label>
+            <input type="text" id="updateCustomerName" placeholder="Leave blank to keep">
+          </div>
+          <div class="field full">
+            <label for="updateCustomerEmail">New Email</label>
+            <input type="text" id="updateCustomerEmail" placeholder="Leave blank to keep">
+          </div>
+        </div>
+        <button id="updateCustomerBtn" class="btn btn-primary">💾 Update Customer</button>
+        <div id="updateCustomerMsg"></div>
+      </div>
+    </div>
+
+    <!-- Filter by Type -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">⊞</span>
+        <h2 class="section-title">Filter by Customer Type</h2>
+        <span class="op-tag">Q4 · SELECT</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Filter customers by role (Recipe Creator / Food Critic), optionally combined with a name search.</p>
+        <div class="form-grid">
+          <div class="field">
+            <label for="customerType">Customer Type</label>
+            <select id="customerType">
+              <option value="recipeCreator">Recipe Creator</option>
+              <option value="foodCritic">Food Critic</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="and_or">Operator</label>
+            <select id="and_or">
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="select_name">Name Filter</label>
+            <input type="text" id="select_name" placeholder="Leave blank for all">
+          </div>
+        </div>
+        <button id="selectCustomerType" class="btn btn-primary">🔍 Filter</button>
+        <div id="customerSelectionResultMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="customer">
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Email</th>
+                <th>Cooking History</th><th>Rating History</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- By Recipe & Rating -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">⭐</span>
+        <h2 class="section-title">Customers by Recipe &amp; Rating</h2>
+        <span class="op-tag">Q6 · JOIN</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Find customers who rated a specific recipe at or above a minimum star threshold.</p>
+        <form id="customersByRecipeForm">
+          <div class="form-grid">
+            <div class="field">
+              <label for="recipeTitleInput">Recipe Title</label>
+              <input type="text" id="recipeTitleInput" placeholder="e.g. Pasta" required>
+            </div>
+            <div class="field">
+              <label for="minStarsInput">Minimum Stars (1–5)</label>
+              <input type="number" id="minStarsInput" min="1" max="5" placeholder="e.g. 4" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">🔍 Search</button>
+        </form>
+        <div id="customersByRecipeMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="customersByRecipeTable" style="display:none">
+            <thead>
+              <tr>
+                <th>Customer ID</th><th>Name</th><th>Email</th><th>Stars</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const statusEl = document.getElementById('dbStatus');
+      const dot = document.getElementById('statusDot');
+      if (!statusEl || !dot) return;
+      new MutationObserver(function () {
+        const t = statusEl.textContent.trim();
+        dot.className = 'status-dot' + (t === 'connected' ? ' ok' : t ? ' err' : '');
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

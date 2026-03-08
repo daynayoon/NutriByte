@@ -1,28 +1,23 @@
-// Backend file that connects to the database. Includes queries. 
+// Backend file that connects to the database. Includes queries.
 
 const path = require('path');
-const oracledb = require('oracledb');
+const { Pool } = require('pg');
 const loadEnvFile = require('./utils/envUtil');
 
 const envVariables = loadEnvFile(path.join(__dirname, '../.env'));
 
-// Database configuration setup. Ensure your .env file has the required database credentials.
-const dbConfig = {
-    user: envVariables.ORACLE_USER,
-    password: envVariables.ORACLE_PASS,
-    connectString: `${envVariables.ORACLE_HOST}:${envVariables.ORACLE_PORT}/${envVariables.ORACLE_DBNAME}`,
-    poolMin: 1,
-    poolMax: 3,
-    poolIncrement: 1,
-    poolTimeout: 60
-};
+const pool = new Pool({
+    user: envVariables.PGUSER,
+    password: envVariables.PGPASSWORD,
+    host: envVariables.PGHOST,
+    port: parseInt(envVariables.PGPORT) || 5432,
+    database: envVariables.PGDATABASE,
+});
 
-// console.log("DB CONNECTING TO:", dbConfig);
-
-// initialize connection pool
 async function initializeConnectionPool() {
     try {
-        await oracledb.createPool(dbConfig);
+        const client = await pool.connect();
+        client.release();
         console.log('Connection pool started');
     } catch (err) {
         console.error('Initialization error: ' + err.message);
@@ -32,7 +27,7 @@ async function initializeConnectionPool() {
 async function closePoolAndExit() {
     console.log('\nTerminating');
     try {
-        await oracledb.getPool().close(10); // 10 seconds grace period for connections to finish
+        await pool.end();
         console.log('Pool closed');
         process.exit(0);
     } catch (err) {
@@ -49,32 +44,32 @@ process
 
 
 // ----------------------------------------------------------
-// Wrapper to manage OracleDB actions, simplifying connection handling.
-async function withOracleDB(action) {
-    let connection;
+// Wrapper to manage PostgreSQL actions, simplifying connection handling.
+async function withPostgresDB(action) {
+    const client = await pool.connect();
     try {
-        connection = await oracledb.getConnection(); // Gets a connection from the default pool 
-        return await action(connection);
+        return await action(client);
     } catch (err) {
         console.error(err);
         throw err;
     } finally {
-        if (connection) {
-            try {
-                await connection.close();
-            } catch (err) {
-                console.error(err);
-            }
-        }
+        client.release();
     }
+}
+
+// Helper: normalize pg result rows to UPPERCASE keys (matches Oracle OUT_FORMAT_OBJECT behavior)
+function uppercaseKeys(rows) {
+    return rows.map(row =>
+        Object.fromEntries(Object.entries(row).map(([k, v]) => [k.toUpperCase(), v]))
+    );
 }
 
 
 // ----------------------------------------------------------
 // Core functions for database operations
-// Modify these functions, especially the SQL queries, based on your project's requirements and design.
-async function testOracleConnection() {
-    return await withOracleDB(async (connection) => {
+async function testDbConnection() {
+    return await withPostgresDB(async (client) => {
+        await client.query('SELECT 1');
         return true;
     }).catch(() => {
         return false;
@@ -82,24 +77,24 @@ async function testOracleConnection() {
 }
 
 async function fetchRecipeFromDb() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute('SELECT * FROM Recipe ORDER BY ID ASC');
-        return result.rows;
+    return await withPostgresDB(async (client) => {
+        const result = await client.query('SELECT * FROM Recipe ORDER BY ID ASC');
+        return result.rows.map(row => Object.values(row));
     }).catch(() => {
         return [];
     });
 }
 
 async function initiateRecipe() {
-    return await withOracleDB(async (connection) => {
+    return await withPostgresDB(async (client) => {
         try {
-            await connection.execute(`DROP TABLE Recipe CASCADE CONSTRAINTS`);
+            await client.query('DROP TABLE IF EXISTS Recipe CASCADE');
         } catch (err) {
             console.log("Recipe table did not exist, continuing...");
         }
 
         try {
-            await connection.execute(`
+            await client.query(`
                 CREATE TABLE Recipe (
                 ID INTEGER,
                 title CHAR(100),
@@ -109,7 +104,7 @@ async function initiateRecipe() {
                 UNIQUE (title),
                 PRIMARY KEY (ID),
                 FOREIGN KEY (cuisineID) REFERENCES Cuisine(ID)
-            )`, [], {autoCommit: true});
+            )`);
 
             console.log("Recipe table created successfully");
             return true;
@@ -120,15 +115,15 @@ async function initiateRecipe() {
         }
 
     }).catch((err) => {
-        console.error("Oracle failure:", err);
+        console.error("PostgreSQL failure:", err);
         return false;
     });
 }
 
 async function insertRecipe(customerID, id, title, time_consumed, difficulty, cuisineID) {
-    return await withOracleDB(async (connection) => {
-        const condition = await connection.execute(
-            `SELECT C.name FROM Customer C WHERE C.ID = :customerID`,
+    return await withPostgresDB(async (client) => {
+        const condition = await client.query(
+            `SELECT C.name FROM Customer C WHERE C.ID = $1`,
             [customerID]
         );
 
@@ -136,8 +131,8 @@ async function insertRecipe(customerID, id, title, time_consumed, difficulty, cu
             throw new Error("Customer ID does not exist!");
         }
 
-        const condition2 = await connection.execute(
-            `SELECT R.ID FROM Recipe R WHERE R.ID = :id`,
+        const condition2 = await client.query(
+            `SELECT R.ID FROM Recipe R WHERE R.ID = $1`,
             [id]
         );
 
@@ -145,8 +140,8 @@ async function insertRecipe(customerID, id, title, time_consumed, difficulty, cu
             throw new Error("Recipe ID already exists. Choose different recipeID!");
         }
 
-        const condition3 = await connection.execute(
-            `SELECT R.title FROM Recipe R WHERE LOWER(TRIM(R.title)) = LOWER(:title)`,
+        const condition3 = await client.query(
+            `SELECT R.title FROM Recipe R WHERE LOWER(TRIM(R.title)) = LOWER($1)`,
             [title]
         );
 
@@ -155,31 +150,28 @@ async function insertRecipe(customerID, id, title, time_consumed, difficulty, cu
         }
 
         try {
-            const result = await connection.execute(
-                `INSERT INTO Recipe (id, title, time_consumed, difficulty, cuisineID) 
-                 VALUES (:id, :title, :time_consumed, :difficulty, :cuisineID)`,
-                [id, title, time_consumed, difficulty, cuisineID],
-                { autoCommit: true }
+            const result = await client.query(
+                `INSERT INTO Recipe (id, title, time_consumed, difficulty, cuisineID)
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [id, title, time_consumed, difficulty, cuisineID]
             );
 
-            await connection.execute(
-                `INSERT INTO AddRelation (CustomerID, RecipeID)
-                 VALUES (:customerID, :id)`,
-                [customerID, id],
-                { autoCommit: true }
+            await client.query(
+                `INSERT INTO AddRelation (CustomerID, RecipeID) VALUES ($1, $2)`,
+                [customerID, id]
             );
 
-            return result.rowsAffected && result.rowsAffected > 0;
+            return result.rowCount > 0;
 
         } catch {
-            return false; // rethrow other errors
+            return false;
         }
     });
 }
 
 async function fetchCustomerFromDb() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
+    return await withPostgresDB(async (client) => {
+        const result = await client.query(
             `
                 SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
                 FROM Customer C
@@ -187,18 +179,15 @@ async function fetchCustomerFromDb() {
                 LEFT JOIN FoodCritic FC ON C.ID = FC.ID
                 ORDER BY C.ID
             `);
-        return result.rows;
+        return result.rows.map(row => Object.values(row));
     }).catch(() => {
         return [];
     });
 }
 
 // Query: SELECT FoodCritic or RecipeCreator and show all customer information for either one of those two categories.
-// (RecipeCreator has cookingHistory and FoodCritic has ratingHistory information shown as well)
-
 async function selectCustomerType(type, name, andOr) {
-    return await withOracleDB(async (connection) => {
-        // Base SQL: join both tables to get all possible info
+    return await withPostgresDB(async (client) => {
         let SQL = `
             SELECT C.ID, C.name, C.email_address, RC.cookingHistory, FC.ratingHistory
             FROM Customer C
@@ -206,28 +195,25 @@ async function selectCustomerType(type, name, andOr) {
             LEFT JOIN FoodCritic FC ON C.ID = FC.ID
         `;
 
-        // Build conditions array
         let conditions = [];
         if (type === "recipeCreator") conditions.push("RC.ID IS NOT NULL");
         if (type === "foodCritic") conditions.push("FC.ID IS NOT NULL");
-        if (name && name.trim().length > 0) conditions.push("LOWER(TRIM(C.name)) = LOWER(:name)");
 
-        // Append WHERE clause if any conditions exist
+        const binds = [];
+        if (name && name.trim().length > 0) {
+            binds.push(name);
+            conditions.push(`LOWER(TRIM(C.name)) = LOWER($${binds.length})`);
+        }
+
         if (conditions.length > 0) {
             SQL += " WHERE " + conditions.join(` ${andOr} `);
         }
 
-        // Order results
         SQL += " ORDER BY C.ID";
 
-        // Prepare bind object
-        const binds = (name && name.trim().length > 0) ? { name } : {};
+        const result = await client.query(SQL, binds);
+        return result.rows.map(row => Object.values(row));
 
-        // Execute query
-        const result = await connection.execute(SQL, binds, { autoCommit: true });
-
-        return result.rows;
-        
     }).catch((err) => {
         console.error("selectCustomerType error:", err);
         return [];
@@ -235,16 +221,16 @@ async function selectCustomerType(type, name, andOr) {
 }
 
 async function savedListCountTable() {
-    return await withOracleDB(async (connection) => {
+    return await withPostgresDB(async (client) => {
         try {
-            const result = await connection.execute(`
+            const result = await client.query(`
                 SELECT S.name AS savedListName, C.name AS ownerName, COUNT(S.recipeID) AS recipeCount
                 FROM SavedLists S
                 JOIN Customer C ON S.ownerID = C.ID
                 GROUP BY S.name, C.name, S.ownerID
                 ORDER BY C.name, S.name
             `);
-            return result.rows;
+            return result.rows.map(row => Object.values(row));
         } catch (err) {
             console.log("Error executing savedListCountTable:", err);
             return [];
@@ -253,49 +239,32 @@ async function savedListCountTable() {
 }
 
 async function findAllRecipes(ing1, ing2, ing3, ing4, ing5) {
-    return await withOracleDB(async (connection) => {
+    return await withPostgresDB(async (client) => {
 
-        // Put all 5 into an array, lowercase and trim input
         const inputIngs = [ing1, ing2, ing3, ing4, ing5]
             .map(x => x ? x.trim().toLowerCase() : "")
-            .filter(x => x.length > 0);   // keep only non-empty
+            .filter(x => x.length > 0);
 
-        // If no ingredients → return all recipes
         if (inputIngs.length === 0) {
-            const result = await connection.execute(
-                `SELECT ID, title FROM Recipe ORDER BY ID`, 
-                {},
-                { autoCommit: true }
-            );
-            return result.rows;
+            const result = await client.query(`SELECT ID, title FROM Recipe ORDER BY ID`);
+            return result.rows.map(row => Object.values(row));
         }
 
-        // Base SQL
-        let SQL = `
+        const placeholders = inputIngs.map((_, i) => `$${i + 1}`).join(", ");
+        const binds = [...inputIngs, inputIngs.length];
+
+        const SQL = `
             SELECT R.ID, R.title
             FROM Recipe R
             JOIN Contain C ON R.ID = C.RecipeID
             JOIN Ingredient I ON C.IngredientID = I.ID
-            WHERE LOWER(TRIM(I.name)) IN (
-        `;
-
-        // Create bind placeholders (:ing0, :ing1, :ing2...)
-        const placeholders = inputIngs.map((_, i) => `:ing${i}`).join(", ");
-        SQL += placeholders + ")";
-
-        // Must match ALL specified ingredients
-        SQL += `
+            WHERE LOWER(TRIM(I.name)) IN (${placeholders})
             GROUP BY R.ID, R.title
-            HAVING COUNT(DISTINCT LOWER(TRIM(I.name))) = :ingCount
+            HAVING COUNT(DISTINCT LOWER(TRIM(I.name))) = $${binds.length}
         `;
 
-        // Create bind object
-        const binds = {};
-        inputIngs.forEach((val, i) => binds[`ing${i}`] = val);
-        binds.ingCount = inputIngs.length;
-
-        const result = await connection.execute(SQL, binds, { autoCommit: true });
-        return result.rows;
+        const result = await client.query(SQL, binds);
+        return result.rows.map(row => Object.values(row));
 
     }).catch(err => {
         console.log("Error executing findAllRecipes:", err);
@@ -305,13 +274,9 @@ async function findAllRecipes(ing1, ing2, ing3, ing4, ing5) {
 
 
 async function fetchIngredients() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
-            `SELECT ID, name FROM Ingredient ORDER BY ID`,
-            [],
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
-        );
-        return result.rows;
+    return await withPostgresDB(async (client) => {
+        const result = await client.query(`SELECT ID, name FROM Ingredient ORDER BY ID`);
+        return uppercaseKeys(result.rows);
     }).catch((err) => {
         console.error("Error fetching ingredients:", err);
         return [];
@@ -319,20 +284,19 @@ async function fetchIngredients() {
 }
 
 async function deleteIngredient(id) {
-    return await withOracleDB(async (connection) => {
+    return await withPostgresDB(async (client) => {
         try {
-            const result = await connection.execute(
-                `DELETE FROM Ingredient WHERE ID = :id`,
-                [id],
-                { autoCommit: true }
+            const result = await client.query(
+                `DELETE FROM Ingredient WHERE ID = $1`,
+                [id]
             );
-            if (!result.rowsAffected || result.rowsAffected === 0) {
+            if (!result.rowCount || result.rowCount === 0) {
                 return { ok: false, reason: 'NOT_FOUND' };
             }
             return { ok: true };
         } catch (err) {
             console.error("Error deleting ingredient:", err);
-            if (err.errorNum === 2292) {
+            if (err.code === '23503') {  // PostgreSQL FK violation
                 return { ok: false, reason: 'HAS_DEPENDENCIES' };
             }
             return { ok: false, reason: 'DB_ERROR' };
@@ -341,24 +305,20 @@ async function deleteIngredient(id) {
 }
 
 async function getCustomersByRecipeAndRating(recipeTitle, minStars) {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
+    return await withPostgresDB(async (client) => {
+        const result = await client.query(
             `
             SELECT C.ID, C.name, C.email_address, R.stars
             FROM Customer C
             JOIN Rate   R  ON C.ID = R.CustomerID
             JOIN Recipe Re ON R.RecipeID = Re.ID
-            WHERE LOWER(TRIM(Re.title)) LIKE '%' || LOWER(TRIM(:recipeTitle)) || '%'
-              AND R.stars >= :minStars
+            WHERE LOWER(TRIM(Re.title)) LIKE '%' || LOWER(TRIM($1)) || '%'
+              AND R.stars >= $2
             ORDER BY C.ID
             `,
-            {
-                recipeTitle,
-                minStars: Number(minStars)
-            },
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+            [recipeTitle, Number(minStars)]
         );
-        return result.rows;
+        return uppercaseKeys(result.rows);
     }).catch((err) => {
         console.error("Error in getCustomersByRecipeAndRating:", err);
         return [];
@@ -367,8 +327,8 @@ async function getCustomersByRecipeAndRating(recipeTitle, minStars) {
 
 
 async function getTopCuisinesByAvgRating() {
-    return await withOracleDB(async (connection) => {
-        const result = await connection.execute(
+    return await withPostgresDB(async (client) => {
+        const result = await client.query(
             `
             SELECT Cu.style,
                    AVG(R.stars) AS avgCuisineRating
@@ -383,11 +343,9 @@ async function getTopCuisinesByAvgRating() {
                 JOIN Rate R2   ON R2.RecipeID = Re2.ID
                 GROUP BY Cu2.style
             )
-            `,
-            [],
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+            `
         );
-        return result.rows;
+        return uppercaseKeys(result.rows);
     }).catch((err) => {
         console.error("Error in getTopCuisinesByAvgRating:", err);
         return [];
@@ -395,28 +353,22 @@ async function getTopCuisinesByAvgRating() {
 }
 
 // UPDATE, PROJECTION, AGGREGATION WITH HAVING Query Implementation
-// UPDATE: PK: ID
 async function updateCustomer(id, newName, newEmail) {
-    return await withOracleDB(async (connection) => {
-        const existing = await connection.execute(
-            `SELECT ID FROM Customer WHERE ID = :id`,
-            { id }
+    return await withPostgresDB(async (client) => {
+        const existing = await client.query(
+            `SELECT ID FROM Customer WHERE ID = $1`,
+            [id]
         );
-        if (existing.rows.length === 0) { return { ok: false, reason: 'NOT_FOUND' };}
-        const result = await connection.execute(
+        if (existing.rows.length === 0) { return { ok: false, reason: 'NOT_FOUND' }; }
+        await client.query(
             `
             UPDATE Customer
-            SET 
-                name = COALESCE(:newName, name),
-                email_address = COALESCE(:newEmail, email_address)
-            WHERE ID = :id
+            SET
+                name = COALESCE($1, name),
+                email_address = COALESCE($2, email_address)
+            WHERE ID = $3
             `,
-            {
-                newName: newName || null,
-                newEmail: newEmail || null,
-                id
-            },
-            { autoCommit: true }
+            [newName || null, newEmail || null, id]
         );
         return { ok: true };
     }).catch(err => {
@@ -426,17 +378,13 @@ async function updateCustomer(id, newName, newEmail) {
 }
 
 
-// PROJECTION 
+// PROJECTION
 async function projectRecipe(attributes) {
-    return await withOracleDB(async (connection) => {
+    return await withPostgresDB(async (client) => {
         const columns = attributes.join(", ");
         const sql = `SELECT ${columns} FROM Recipe`;
-
-        const result = await connection.execute(sql, [], {
-            outFormat: oracledb.OUT_FORMAT_ARRAY
-        });
-
-        return result.rows;
+        const result = await client.query(sql);
+        return result.rows.map(row => Object.values(row));
     }).catch((err) => {
         console.error("Projection error:", err);
         return null;
@@ -445,23 +393,19 @@ async function projectRecipe(attributes) {
 
 // AGGREGATION with HAVING: recipe title which has average rating >= threshold
 async function getRecipesAboveAvgRating(threshold) {
-    return await withOracleDB(async (connection) => {
-        const SQL = `
+    return await withPostgresDB(async (client) => {
+        const result = await client.query(
+            `
             SELECT R.title, AVG(RT.stars) AS avg_rating
             FROM Recipe R
             JOIN Rate RT ON R.ID = RT.RecipeID
             GROUP BY R.ID, R.title
-            HAVING AVG(RT.stars) >= :threshold
+            HAVING AVG(RT.stars) >= $1
             ORDER BY avg_rating DESC
-        `;
-
-        const result = await connection.execute(
-            SQL,
-            { threshold: Number(threshold) },
-            { outFormat: oracledb.OUT_FORMAT_OBJECT }
+            `,
+            [Number(threshold)]
         );
-
-        return result.rows;
+        return uppercaseKeys(result.rows);
     }).catch((err) => {
         console.error("Error in getRecipesAboveAvgRating:", err);
         return [];
@@ -471,10 +415,10 @@ async function getRecipesAboveAvgRating(threshold) {
 
 
 module.exports = {
-    testOracleConnection,
+    testDbConnection,
     fetchRecipeFromDb,
-    initiateRecipe, 
-    insertRecipe, 
+    initiateRecipe,
+    insertRecipe,
     fetchCustomerFromDb,
     selectCustomerType,
     savedListCountTable,

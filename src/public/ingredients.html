@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriByte — Ingredients</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a href="index.html" class="nav-logo">NutriByte</a>
+    <div class="nav-right">
+      <div class="db-badge">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="dbStatus"></span>
+        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="">
+      </div>
+      <a href="index.html" class="back-link">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="page-hero hero-ingredients">
+    <span class="hero-emoji">🥕</span>
+    <h1>Ingredients</h1>
+    <p>View and manage all available ingredients in the database</p>
+  </div>
+
+  <div class="page-content">
+
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">🗑️</span>
+        <h2 class="section-title">Manage Ingredients</h2>
+        <span class="op-tag">Q3 · DELETE</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Click <strong>delete</strong> to remove an ingredient. Cannot delete if the ingredient is used in a recipe.</p>
+        <div id="deleteIngredientMsg"></div>
+        <div class="table-wrap" style="margin-top:12px">
+          <table id="ingredientTable">
+            <thead>
+              <tr>
+                <th>Ingredient ID</th>
+                <th>Ingredient Name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const statusEl = document.getElementById('dbStatus');
+      const dot = document.getElementById('statusDot');
+      if (!statusEl || !dot) return;
+      new MutationObserver(function () {
+        const t = statusEl.textContent.trim();
+        dot.className = 'status-dot' + (t === 'connected' ? ' ok' : t ? ' err' : '');
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

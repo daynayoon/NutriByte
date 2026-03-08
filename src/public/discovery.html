@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriByte — Discovery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a href="index.html" class="nav-logo">NutriByte</a>
+    <div class="nav-right">
+      <div class="db-badge">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="dbStatus"></span>
+        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="">
+      </div>
+      <a href="index.html" class="back-link">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="page-hero hero-discovery">
+    <span class="hero-emoji">🔍</span>
+    <h1 style="color:#3B2E26">Discovery</h1>
+    <p>Find recipes that contain all your chosen ingredients</p>
+  </div>
+
+  <div class="page-content">
+
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">🥗</span>
+        <h2 class="section-title">Find Recipes by Ingredients</h2>
+        <span class="op-tag">Q10 · DIVISION</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Enter up to 5 ingredients — returns every recipe that contains <strong>all</strong> of them.</p>
+        <form id="findAllRecipes">
+          <div class="form-grid">
+            <div class="field">
+              <label for="ingone">Ingredient 1</label>
+              <input type="text" id="ingone" placeholder="e.g. Egg" maxlength="50">
+            </div>
+            <div class="field">
+              <label for="ingtwo">Ingredient 2</label>
+              <input type="text" id="ingtwo" placeholder="e.g. Cheese" maxlength="50">
+            </div>
+            <div class="field">
+              <label for="ingthree">Ingredient 3</label>
+              <input type="text" id="ingthree" placeholder="Optional" maxlength="50">
+            </div>
+            <div class="field">
+              <label for="ingfour">Ingredient 4</label>
+              <input type="text" id="ingfour" placeholder="Optional" maxlength="50">
+            </div>
+            <div class="field">
+              <label for="ingfive">Ingredient 5</label>
+              <input type="text" id="ingfive" placeholder="Optional" maxlength="50">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">🔍 Find Recipes</button>
+        </form>
+        <div id="findAllRecipeResultMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="findAllRecipesTable">
+            <thead>
+              <tr>
+                <th>Recipe ID</th>
+                <th>Recipe Title</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const statusEl = document.getElementById('dbStatus');
+      const dot = document.getElementById('statusDot');
+      if (!statusEl || !dot) return;
+      new MutationObserver(function () {
+        const t = statusEl.textContent.trim();
+        dot.className = 'status-dot' + (t === 'connected' ? ' ok' : t ? ' err' : '');
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

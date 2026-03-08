@@ -4,7 +4,11 @@
     "description": "The sample Node.js project for CPSC304.",
     "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+        "start": "node server.js",
+        "dev": "nodemon server.js",
+        "lint": "eslint . --ext .js --ignore-pattern node_modules",
+        "lint:fix": "eslint . --ext .js --ignore-pattern node_modules --fix",
+        "check": "node --check server.js && node --check appController.js && node --check appService.js && node --check utils/envUtil.js"
     },
     "keywords": [],
     "author": {
@@ -13,7 +17,10 @@
     "license": "ISC",
     "dependencies": {
       "express": "^4.17.3",
-      "oracledb": "^5.2.0"
+      "pg": "^8.11.0"
+    },
+    "devDependencies": {
+      "eslint": "^8.57.0",
+      "nodemon": "^3.1.0"
     }
   }
-  

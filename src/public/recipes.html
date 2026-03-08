@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriByte — Recipes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <nav class="page-nav">
+    <a href="index.html" class="nav-logo">NutriByte</a>
+    <div class="nav-right">
+      <div class="db-badge">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="dbStatus"></span>
+        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="">
+      </div>
+      <a href="index.html" class="back-link">← Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="page-hero hero-recipes">
+    <span class="hero-emoji">🍝</span>
+    <h1>Recipes</h1>
+    <p>Browse, add, and explore your recipe collection</p>
+  </div>
+
+  <div class="page-content">
+
+    <!-- All Recipes -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">📋</span>
+        <h2 class="section-title">All Recipes</h2>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table id="recipe">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Time (min)</th>
+                <th>Difficulty</th>
+                <th>Cuisine ID</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insert Recipe -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">✏️</span>
+        <h2 class="section-title">Insert Recipe</h2>
+        <span class="op-tag">Q1 · INSERT</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Add a new recipe linked to an existing customer account.</p>
+        <form id="insertRecipe">
+          <div class="form-grid">
+            <div class="field">
+              <label for="insertCustomerID">Customer ID</label>
+              <input type="number" id="insertCustomerID" placeholder="e.g. 1" required>
+            </div>
+            <div class="field">
+              <label for="insertId">Recipe ID</label>
+              <input type="number" id="insertId" placeholder="e.g. 11" required>
+            </div>
+            <div class="field">
+              <label for="insertTitle">Title</label>
+              <input type="text" id="insertTitle" placeholder="Recipe name" maxlength="100">
+            </div>
+            <div class="field">
+              <label for="insertTimeConsumed">Time (minutes)</label>
+              <input type="number" id="insertTimeConsumed" placeholder="e.g. 30">
+            </div>
+            <div class="field">
+              <label for="insertDifficulty">Difficulty</label>
+              <select id="insertDifficulty">
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="insertCuisineID">Cuisine ID (1–5)</label>
+              <input type="number" id="insertCuisineID" placeholder="1=Japanese … 5=Western">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">🍴 Insert Recipe</button>
+        </form>
+        <div id="insertResultMsg"></div>
+      </div>
+    </div>
+
+    <!-- Projection -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">🔬</span>
+        <h2 class="section-title">Recipe Projection</h2>
+        <span class="op-tag">Q5 · PROJECTION</span>
+      </div>
+      <div class="card">
+        <p class="section-desc">Choose which columns to display from the Recipe table.</p>
+        <div class="checkbox-grid">
+          <label class="checkbox-pill"><input type="checkbox" class="projAttr" value="ID"> ID</label>
+          <label class="checkbox-pill"><input type="checkbox" class="projAttr" value="title"> Title</label>
+          <label class="checkbox-pill"><input type="checkbox" class="projAttr" value="time_consumed"> Time Consumed</label>
+          <label class="checkbox-pill"><input type="checkbox" class="projAttr" value="difficulty"> Difficulty</label>
+          <label class="checkbox-pill"><input type="checkbox" class="projAttr" value="cuisineID"> Cuisine ID</label>
+        </div>
+        <button class="btn btn-primary" onclick="runRecipeProjection()">▶ Run Projection</button>
+        <div id="projectionMsg"></div>
+        <div class="table-wrap" style="margin-top:16px">
+          <table id="projectionRecipeTable">
+            <thead><tr id="projectionHeader"></tr></thead>
+            <tbody id="projectionBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reset Data -->
+    <div class="section">
+      <div class="section-head">
+        <span class="section-emoji">↺</span>
+        <h2 class="section-title">Reset Recipe Data</h2>
+      </div>
+      <div class="card card-warn">
+        <p class="section-desc">Drops and recreates the Recipe table with seed data. Run this once for initial setup.</p>
+        <button id="resetRecipe" class="btn btn-warn">↺ Reset All Recipes</button>
+        <div id="resetResultMsg"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const statusEl = document.getElementById('dbStatus');
+      const dot = document.getElementById('statusDot');
+      if (!statusEl || !dot) return;
+      new MutationObserver(function () {
+        const t = statusEl.textContent.trim();
+        dot.className = 'status-dot' + (t === 'connected' ? ' ok' : t ? ' err' : '');
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+  <script src="scripts.js"></script>
+</body>
+</html>

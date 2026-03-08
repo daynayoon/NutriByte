@@ -562,25 +562,26 @@ async function runHavingQuery() {
 
 // ---------------------------------------------------------------
 // Initializes the webpage functionalities.
-// Add or remove event listeners based on the desired functionalities.
 window.onload = function() {
     checkDbConnection();
-    fetchTableData();
-    // fetchAllIngredients();
-    fetchAndDisplayIngredients();
-    document.getElementById("resetRecipe").addEventListener("click", resetRecipe);
-    document.getElementById("insertRecipe").addEventListener("submit", insertRecipe);
-    document.getElementById("selectCustomerType").addEventListener("click", selectCustomerType);
-    document.getElementById("savedListCountBtn").addEventListener("click", savedListRecipeCount);
-    document.getElementById("updateCustomerBtn").addEventListener("click", updateCustomer);
-    document.getElementById("findAllRecipes").addEventListener("submit", findAllRecipes);
-    document.getElementById("customersByRecipeForm").addEventListener("submit", customersByRecipe);
-    document.getElementById("loadTopCuisines").addEventListener("click", loadTopCuisines);
+    const el = (id) => document.getElementById(id);
+
+    if (el('recipe'))              fetchAndDisplayUsers();
+    if (el('customerUpdateTable')) fetchAndDisplayCustomerType();
+    if (el('ingredientTable'))     fetchAndDisplayIngredients();
+
+    el('resetRecipe')           ?.addEventListener('click', resetRecipe);
+    el('insertRecipe')          ?.addEventListener('submit', insertRecipe);
+    el('selectCustomerType')    ?.addEventListener('click', selectCustomerType);
+    el('savedListCountBtn')     ?.addEventListener('click', savedListRecipeCount);
+    el('updateCustomerBtn')     ?.addEventListener('click', updateCustomer);
+    el('findAllRecipes')        ?.addEventListener('submit', findAllRecipes);
+    el('customersByRecipeForm') ?.addEventListener('submit', customersByRecipe);
+    el('loadTopCuisines')       ?.addEventListener('click', loadTopCuisines);
 };
 
-// General function to refresh the displayed table data. 
-// You can invoke this after any table-modifying operation to keep consistency.
+// General function to refresh the displayed table data.
 function fetchTableData() {
-    fetchAndDisplayUsers();
-    fetchAndDisplayCustomerType();
+    if (document.getElementById('recipe'))              fetchAndDisplayUsers();
+    if (document.getElementById('customerUpdateTable')) fetchAndDisplayCustomerType();
 }

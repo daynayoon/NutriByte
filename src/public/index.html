@@ -1,337 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <!-- This meta tag ensures that the website renders correctly across different device sizes, enhancing mobile responsiveness. -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Link to the external CSS stylesheet. Uncomment if you wish to customize or add styling. -->
-    <link rel="stylesheet" href="styles.css">
-
-    <title>Recipe Application</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriByte — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Pacifico&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Dashboard-only styles */
+    .dashboard-hero {
+      padding: 60px 40px 52px;
+      text-align: center;
+      background-color: #FFF5ED;
+      background-image: radial-gradient(#FFD8C4 1.5px, transparent 1.5px);
+      background-size: 26px 26px;
+      border-radius: 0 0 32px 32px;
+      margin-bottom: 40px;
+      animation: fade-up .5s ease both;
+    }
+    .dashboard-hero .logo-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 48px; color: var(--accent);
+      margin-bottom: 6px;
+      display: block;
+    }
+    .dashboard-hero .tagline {
+      font-size: 16px; color: var(--muted); font-weight: 600;
+      margin-bottom: 24px;
+    }
+  </style>
 </head>
 <body>
-    <!-- ===================================================================================== -->
-    <!-- Display the current status of the database connection. 
-         !!HERE TO HELP U DEBUGGING, NOT REQUIRED IN YOUR OWN PROJECT!!
-         -->
 
-    <h1>Recipe Application</h1>
-
-    <h2>Database Connection Status: 
-        <!-- An in-line placeholder to display connection status. -->
-        <span id="dbStatus"> </span>
-        <!-- A loading GIF, will be hided once get the status. -->
-        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="Loading...">
-    </h2>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <!-- Show 'Recipe'. 
-        Data will be fetched and inserted here dynamically using JavaScript. -->
-    <h2>Show Recipe</h2>
-    <table id="recipe" border="1">
-        <thead>
-            <tr>
-                <!--Table head, need to be adjusted accordingly to align with your own.-->
-                <th>ID</th>
-                <th>Title</th>
-                <th>time_consumed</th>
-                <th>difficulty</th>
-                <th>cuisineID</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Reset All Recipe</h2>
-    <p>If you wish to reset the table press on the reset button. If this is the first time you're running this page, you MUST use reset</p>
-    <button id="resetRecipe"> reset </button> <br>
-    <!-- A placeholder to display messages related to the reset operation. -->
-    <div id="resetResultMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2> Query 1: Insert Values into Recipe </h2>
-    <form id="insertRecipe">
-        Customer ID: <input type="number" id="insertCustomerID" placeholder="Enter your ID" required> <br><br>
-        Recipe ID: <input type="number" id="insertId" placeholder="Enter Recipe ID" required> <br><br>
-        Title: <input type="text" id="insertTitle" placeholder="Enter Title" maxlength="100"> <br><br>
-        time_consumed: <input type="number" id="insertTimeConsumed" placeholder="Enter Time Consumed (number in minutes)" maxlength="20"> <br><br>
-        difficulty:
-        <select id="insertDifficulty">
-            <option value="Easy">Easy</option>
-            <option value="Medium">Medium</option>
-            <option value="Hard">Hard</option>
-        </select> <br><br>
-        cuisineID: <input type="number" id="insertCuisineID" placeholder="Enter Cuisine ID" maxlength="20"> <br><br>
-
-        <button type="submit"> insert </button> <br>
-    </form>
-    <div id="insertResultMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 2: Update Customer Info</h2>
-
-    <table id="customerUpdateTable" border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email Address</th>
-            <th>Cooking History</th>
-            <th>Rating History</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-    </table>
-
-    <br><br>
-
-    <p>Select a customer and update their name or email address.</p>
-
-    Customer ID:
-    <input type="number" id="updateCustomerID" placeholder="Enter Customer ID">
-    <br><br>
-
-    New Name:
-    <input type="text" id="updateCustomerName" placeholder="Enter New Name">
-    <br><br>
-
-    New Email:
-    <input type="text" id="updateCustomerEmail" placeholder="Enter New Email">
-    <br><br>
-
-    <button id="updateCustomerBtn">Update Customer</button>
-
-    <div id="updateCustomerMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <!-- DELETE: show ingredients with delete buttons -->
-    <h2>Query 3: Delete Ingredient</h2>
-    <p>Click “delete” to remove an ingredient.</p>
-
-    <table id="ingredientTable" border="1" style="margin-top:10px">
-        <thead>
-            <tr>
-                <th>Ingredient ID</th>
-                <th>Ingredient Name</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-    <div id="deleteIngredientMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 4: Select Customer Type</h2>
-
-    <!-- Show 'Customer'. 
-        Data will be fetched and inserted here dynamically using JavaScript. -->
-    Show Customer based on Type:
-        <table id="customer" border="1">
-            <thead>
-                <tr>
-                    <!--Table head, need to be adjusted accordingly to align with your own.-->
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>email_address</th>
-                    <th>cookingHistory</th>
-                    <th>ratingHistory</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    Customer Type:
-    <select id="customerType">
-        <option value="recipeCreator">Recipe Creator</option>
-        <option value="foodCritic">Food Critic</option>
-    </select> <br><br>
-
-    AND/OR:
-    <select id="and_or">
-        <option value="AND">AND</option>
-        <option value="OR">OR</option>
-    </select> <br><br>
-    
-    name:
-    <input type="text" id="select_name" placeholder="Enter name"> <br><br>
-
-    <button type="submit" id="selectCustomerType"> update </button> <br>
-    
-    <!-- A placeholder to display messages related to the select operation. -->
-    <div id="customerSelectionResultMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 5: Projection on Recipe</h2>
-
-    <p>Select attributes to display:</p>
-
-    <div class="attribute-container">
-        <div class="projection-row">
-            <span>ID</span>
-            <input type="checkbox" class="projAttr" value="ID">
-        </div>
-
-        <div class="projection-row">
-            <span>Title</span>
-            <input type="checkbox" class="projAttr" value="title">
-        </div>
-
-        <div class="projection-row">
-            <span>Time Consumed</span>
-            <input type="checkbox" class="projAttr" value="time_consumed">
-        </div>
-
-        <div class="projection-row">
-            <span>Difficulty</span>
-            <input type="checkbox" class="projAttr" value="difficulty">
-        </div>
-
-        <div class="projection-row">
-            <span>Cuisine ID</span>
-            <input type="checkbox" class="projAttr" value="cuisineID">
-        </div>
+  <nav class="page-nav">
+    <span class="nav-logo">NutriByte</span>
+    <div class="nav-right">
+      <div class="db-badge">
+        <div id="statusDot" class="status-dot"></div>
+        <span id="dbStatus"></span>
+        <img id="loadingGif" class="loading-gif" src="loading_100px.gif" alt="">
+      </div>
     </div>
+  </nav>
 
-    <button onclick="runRecipeProjection()">Run Projection</button>
+  <div class="dashboard-hero">
+    <span class="logo-title">NutriByte 🍳</span>
+    <p class="tagline">Your friendly recipe &amp; nutrition management kitchen</p>
+    <div class="db-badge" style="display:inline-flex; margin:0 auto">
+      <div id="statusDot2" class="status-dot"></div>
+      <span style="font-size:13px; font-weight:700; color:var(--muted)">Database</span>
+    </div>
+  </div>
 
-    <div id="projectionMsg"></div>
+  <div class="page-content">
+    <div class="card-grid">
 
-    <br>
+      <a href="recipes.html" class="feature-card">
+        <span class="fc-emoji">🍝</span>
+        <div class="fc-title">Recipes</div>
+        <div class="fc-desc">Browse all recipes, add new ones, and run projections</div>
+        <span class="fc-link">Open →</span>
+      </a>
 
-    <table id="projectionRecipeTable" border="1">
-        <thead><tr id="projectionHeader"></tr></thead>
-        <tbody id="projectionBody"></tbody>
-    </table>
+      <a href="customers.html" class="feature-card">
+        <span class="fc-emoji">👥</span>
+        <div class="fc-title">Customers</div>
+        <div class="fc-desc">Update profiles, filter by type, and find by rating</div>
+        <span class="fc-link">Open →</span>
+      </a>
 
-    <br><hr><br> <!-- ========================================================================= -->
+      <a href="ingredients.html" class="feature-card">
+        <span class="fc-emoji">🥕</span>
+        <div class="fc-title">Ingredients</div>
+        <div class="fc-desc">View and manage all available ingredients</div>
+        <span class="fc-link">Open →</span>
+      </a>
 
-    <!-- JOIN: customers who rated a given recipe with >= minStars -->
-    <h2>Query 6: Customers By Recipe and Rating (JOIN)</h2>
+      <a href="analytics.html" class="feature-card">
+        <span class="fc-emoji">📊</span>
+        <div class="fc-title">Analytics</div>
+        <div class="fc-desc">Saved list counts, rating filters, and top cuisines</div>
+        <span class="fc-link">Open →</span>
+      </a>
 
-    <form id="customersByRecipeForm">
-        Recipe Title: <input type="text" id="recipeTitleInput" placeholder="Enter recipe title" required> <br><br>
-        Minimum Stars: <input type="number" id="minStarsInput" placeholder="1–5" min="1" max="5" required> <br><br>
-        <button type="submit"> search </button>
-    </form>
+      <a href="discovery.html" class="feature-card">
+        <span class="fc-emoji">🔍</span>
+        <div class="fc-title">Discovery</div>
+        <div class="fc-desc">Find recipes that contain all your chosen ingredients</div>
+        <span class="fc-link">Open →</span>
+      </a>
 
-    <table id="customersByRecipeTable" border="1" style="margin-top:10px; display:none;">
-        <thead>
-            <tr>
-                <th>Customer ID</th>
-                <th>Name</th>
-                <th>email_address</th>
-                <th>stars</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+    </div>
+  </div>
 
-    <div id="customersByRecipeMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 7: Count recipes in savedlists</h2>
-
-    <button type="submit" id="savedListCountBtn">Show Recipe Counts per Saved List</button>
-
-    <table id="savedListCountTable" border="1" style="margin-top:10px">
-        <thead>
-            <tr>
-                <th>SavedList Name</th>
-                <th>Owner Name</th>
-                <th>Recipe Count</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div id="savedListCountResultMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 8: Aggregation with HAVING</h2>
-    <h3>(Recipes with Avg Rating ≥ Threshold)</h3>
-
-    <p>Enter rating threshold:</p>
-    <input type="number" step="0.1" id="havingThreshold" placeholder="e.g., 4.0">
-
-    <br><br>
-    <button onclick="runHavingQuery()">Run HAVING Query</button>
-
-    <div id="havingMsg"></div>
-
-    <br>
-
-    <table id="havingTable" border="1">
-        <thead>
-            <tr id="havingHeader">
-                <th>Recipe Title</th>
-                <th>Average Rating</th>
-            </tr>
-        </thead>
-        <tbody id="havingBody"></tbody>
-    </table>
-
-    <br><hr><br> <!-- ===================================================================================== -->
-    <!-- Nested Aggregation: cuisines with highest average rating -->
-    <h2>Query 9: Top Cuisines by Average Rating (Nested Aggregation)</h2>
-
-    <button id="loadTopCuisines">show top cuisines</button>
-
-    <table id="topCuisinesTable" border="1" style="margin-top:10px; display:none;">
-        <thead>
-            <tr>
-                <th>Cuisine Style</th>
-                <th>Average Rating</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div id="topCuisinesMsg"></div>
-
-    <br><hr><br> <!-- ========================================================================= -->
-
-    <h2>Query 10: Find recipe with all ingredients</h2>
-
-    <form id="findAllRecipes">
-        ingredient1: <input type="text" id="ingone" placeholder="Enter first ingredient" maxlength="50"> <br><br>
-        ingredient2: <input type="text" id="ingtwo" placeholder="Enter second ingredient" maxlength="50"> <br><br>
-        ingredient3: <input type="text" id="ingthree" placeholder="Enter third ingredient" maxlength="50"> <br><br>
-        ingredient4: <input type="text" id="ingfour" placeholder="Enter fourth ingredient" maxlength="50"> <br><br>
-        ingredient5: <input type="text" id="ingfive" placeholder="Enter fifth ingredient" maxlength="50"> <br><br>
-
-        <button type="submit"> find recipes </button> <br>
-    </form>
-
-    <table id="findAllRecipesTable" border="1" style="margin-top:10px">
-        <thead>
-            <tr>
-                <th>Recipe ID</th>
-                <th>Recipe Title</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <div id="findAllRecipeResultMsg"></div>
-
-    <!-- ===================================================================================== -->
-
-    <!-- External JavaScript file that contains the functionality/logic for the operations above. -->
-    <script src="scripts.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      const els = [document.getElementById('statusDot'), document.getElementById('statusDot2')];
+      const statusEl = document.getElementById('dbStatus');
+      if (!statusEl) return;
+      new MutationObserver(function () {
+        const t = statusEl.textContent.trim();
+        const cls = 'status-dot' + (t === 'connected' ? ' ok' : t ? ' err' : '');
+        els.forEach(d => { if (d) d.className = cls; });
+      }).observe(statusEl, { childList: true, characterData: true, subtree: true });
+    });
+  </script>
+  <script src="scripts.js"></script>
 </body>
 </html>
