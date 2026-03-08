@@ -15,8 +15,8 @@ function loadEnvFile(filePath) {
 
         return envVars;
     } else {
-        console.error(`.env file not found at ${filePath}`);
-        return {};
+        // In serverless environments (e.g. Vercel), fall back to process.env
+        return process.env;
     }
 }
 

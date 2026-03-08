@@ -6,13 +6,15 @@ const loadEnvFile = require('./utils/envUtil');
 
 const envVariables = loadEnvFile(path.join(__dirname, '../.env'));
 
-const pool = new Pool({
-    user: envVariables.PGUSER,
-    password: envVariables.PGPASSWORD,
-    host: envVariables.PGHOST,
-    port: parseInt(envVariables.PGPORT) || 5432,
-    database: envVariables.PGDATABASE,
-});
+const pool = envVariables.DATABASE_URL
+    ? new Pool({ connectionString: envVariables.DATABASE_URL, ssl: { rejectUnauthorized: false } })
+    : new Pool({
+        user: envVariables.PGUSER,
+        password: envVariables.PGPASSWORD,
+        host: envVariables.PGHOST,
+        port: parseInt(envVariables.PGPORT) || 5432,
+        database: envVariables.PGDATABASE,
+    });
 
 async function initializeConnectionPool() {
     try {
